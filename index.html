@@ -58,9 +58,13 @@
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
         
         <div style="padding: 10px; text-align: center;">
-            <button class="primary-btn" style="background: gold; color: black; margin-bottom: 15px;" onclick="announceWinner()">🏆 ANNOUNCE FINAL SCORES</button>
+            <button class="primary-btn" style="background: gold; color: black; margin-bottom: 15px; font-weight: bold; width: 100%; padding: 15px; border-radius: 8px; border: none; cursor: pointer;" onclick="triggerFinalReveal()">
+                🏆 SHOW FINAL WINNER
+            </button>
             <br>
-            <button class="danger-btn" onclick="resetGameForUser()" style="background: #ff4444; color: white; border: none; padding: 10px; border-radius: 5px;">⚠️ Reset This Device</button>
+            <button class="danger-btn" onclick="resetGameForUser()" style="background: #ff4444; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+                ⚠️ Reset This Device
+            </button>
         </div>
     </section>
 
@@ -77,7 +81,7 @@
     </div>
 
     <div id="winner-overlay" class="modal" style="display:none; background: rgba(0,0,0,0.95); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; justify-content: center; align-items: center;">
-        <div class="modal-content" style="background: linear-gradient(45deg, #ffd700, #ffae00); color: #2c3e50; text-align: center; padding: 40px; border-radius: 15px;">
+        <div class="modal-content" style="background: linear-gradient(45deg, #ffd700, #ffae00); color: #2c3e50; text-align: center; padding: 40px; border-radius: 15px; max-width: 80%;">
             <h1 style="font-family: 'Cinzel', serif; font-size: 2.5em; margin: 0;">🏆 CHAMPIONS 🏆</h1>
             <div id="winner-team-name" style="font-size: 2.2em; font-weight: bold; margin: 20px 0; text-transform: uppercase;">TEAM NAME</div>
             <p id="winner-score" style="font-size: 1.5em; margin-bottom: 30px;">With 000 Points!</p>
@@ -87,13 +91,13 @@
 
     <script src="app.js"></script>
     <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('SW Registered'))
-        .catch(err => console.log('SW Failed', err));
-    });
-  }
-</script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+    </script>
 </body>
 </html>
