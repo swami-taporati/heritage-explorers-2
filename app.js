@@ -1,136 +1,229 @@
-const TEAM_PINS = { "Indian Roller": "1234", "Asian Elephant": "5678", "Lotus": "1111", "Sandalwood": "2222", "Mango": "3333" };
-let currentTeam = localStorage.getItem('activeTeam') || null;
+/* ==========================================
+   CONFIG & DATA
+   ========================================== */
+const GOOGLE_SCRIPT_URL = "YOUR_DEPLOYED_WEB_APP_URL";
+
+const TEAM_CONFIG = {
+    "Indian Roller": { pin: "4921", icon: "🐦" },
+    "Asian Elephant": { pin: "8374", icon: "🐘" },
+    "Lotus": { pin: "2569", icon: "🪷" },
+    "Sandalwood": { pin: "7103", icon: "🪵" },
+    "Mango": { pin: "6482", icon: "🥭" }
+};
+
 const QUEST_DATA = [
-    { day: 2, loc: "Bannerghatta", code: "WILD26", task: "PHOTO: Capture a herbivore and a carnivore (safari). QUIZ: Which animal is the state animal of Karnataka?", type: "Mixed", auto: 10 },
-    { day: 2, loc: "Music Museum", code: "RAGA", task: "VIDEO: Record a 10-second clip of a team member trying a traditional instrument.", type: "Video", auto: 0 },
-    { day: 3, loc: "Hampi (Virupaksha)", code: "RAYA", task: "PHOTO: Find the 'Inverted Shadow' of the temple tower. QUIZ: Which empire ruled from here?", type: "Mixed", auto: 10 },
-    { day: 4, loc: "Hampi (Vittala)", code: "CHARIOT", task: "PHOTO: Pose like the stone chariot behind you. TASK: Count the number of pillars in the musical hall.", type: "Photo", auto: 5 },
-    { day: 4, loc: "JSW Kaladham", code: "STEEL", task: "PHOTO: Take a creative group photo with the 3D Hampi exhibits.", type: "Photo", auto: 0 },
-    { day: 6, loc: "Chitradurga", code: "OBAVVA", task: "VIDEO: Re-enact the story of Onake Obavva at the 'Kalla Kindi' (secret opening).", type: "Video", auto: 0 },
-    { day: 7, loc: "Agumbe", code: "RAIN", task: "IDENTIFY: Find 3 types of medicinal plants with the help of a farmer and list them.", type: "Text", auto: 10 },
-    { day: 8, loc: "Sringeri", code: "SHARADA", task: "QUIZ: Name the river flowing beside the temple. PHOTO: The zodiac pillars (Rashistambhas).", type: "Mixed", auto: 10 },
-    { day: 8, loc: "Bhoota Kola", code: "SPIRIT", task: "VIDEO: Record a short clip of the ritual dance and describe the emotion in one word.", type: "Video", auto: 0 },
-    { day: 9, loc: "Kambala", code: "BUFFALO", task: "PHOTO: A selfie with the racing track in the background. QUIZ: What are the animals used in this race?", type: "Mixed", auto: 10 }
+    { id: 1, loc: "Bannerghatta", code: "WILD26", task: "PHOTO: Capture a herbivore and a carnivore. QUIZ: Which animal is the state animal?", auto: 10 },
+    { id: 2, loc: "Music Museum", code: "RAGA", task: "VIDEO: Record a 10s clip of a team member playing a traditional instrument.", auto: 0 },
+    { id: 3, loc: "Hampi (Virupaksha)", code: "RAYA", task: "PHOTO: Find the 'Inverted Shadow'. QUIZ: Which empire ruled Hampi?", auto: 10 },
+    { id: 4, loc: "Hampi (Vittala)", code: "CHARIOT", task: "PHOTO: Pose like the stone chariot. TASK: Count the musical pillars.", auto: 5 },
+    { id: 5, loc: "JSW Kaladham", code: "STEEL", task: "PHOTO: Group selfie with the 3D Hampi exhibits.", auto: 0 },
+    { id: 6, loc: "Chitradurga", code: "OBAVVA", task: "VIDEO: Re-enact Onake Obavva's story at the secret opening.", auto: 0 },
+    { id: 7, loc: "Agumbe", code: "RAIN", task: "IDENTIFY: Find 3 medicinal plants with a farmer and list them.", auto: 10 },
+    { id: 8, loc: "Sringeri", code: "SHARADA", task: "PHOTO: The zodiac pillars. QUIZ: Which river flows beside the temple?", auto: 10 },
+    { id: 9, loc: "Bhoota Kola", code: "SPIRIT", task: "VIDEO: Record the ritual dance and describe the emotion in one word.", auto: 0 },
+    { id: 10, loc: "Kambala", code: "BUFFALO", task: "PHOTO: Selfie with the track. QUIZ: Which animals are used in this race?", auto: 10 }
 ];
 
-function addDynamicQuest() {
-    const newLoc = prompt("Enter New Location (e.g., Udupi):");
-    const newCode = prompt("Set Unlock Code:");
-    const newTask = prompt("Enter the Challenge Description:");
+let currentTeam = localStorage.getItem('activeTeam') || null;
+let selectedTeamTemp = "";
+let tapCount = 0;
 
-    if (newLoc && newCode && newTask) {
-        QUEST_DATA.push({
-            day: "Extra",
-            loc: newLoc,
-            code: newCode.toUpperCase(),
-            task: newTask,
-            type: "Dynamic",
-            auto: 0
-        });
-        alert("Challenge Added! Give the code " + newCode + " to students when ready.");
-        loadDashboard(); // Refresh the list
+/* ==========================================
+   INITIALIZATION
+   ========================================== */
+window.onload = () => {
+    if (currentTeam) {
+        showSection('dashboard');
+        loadDashboard();
     }
+    startSyncInterval();
+};
+
+/* ==========================================
+   NAVIGATION & UI
+   ========================================== */
+function showSection(id) {
+    document.querySelectorAll('section').forEach(s => s.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+    document.getElementById('main-nav').style.display = currentTeam ? 'flex' : 'none';
 }
 
-function checkFinalReveal() {
-    const completed = JSON.parse(localStorage.getItem('completedLevels') || "[]");
-    if (completed.length === QUEST_DATA.length) {
-        alert("✨ GRAND REVEAL UNLOCKED! ✨\nYour Clue Pieces: 'The first key to the lost empire lies within the spirit of Karnataka.'");
-        // You could also redirect to a special 'Winner' page
-    }
+function prepLogin(teamName) {
+    selectedTeamTemp = teamName;
+    const config = TEAM_CONFIG[teamName];
+    document.getElementById('modal-team-name').innerHTML = `${config.icon} Team ${teamName}`;
+    document.getElementById('pin-modal').style.display = 'flex';
 }
 
-
-// Offline Save Logic
-function saveProgress(data) {
-    localStorage.setItem('heritage_save', JSON.stringify(data));
-    // Try to sync to Google Sheets if online
-    if (navigator.onLine) { syncToGoogleSheets(data); }
+function hidePinEntry() {
+    document.getElementById('pin-modal').style.display = 'none';
+    document.getElementById('team-pin').value = "";
 }
 
 function login() {
     const pin = document.getElementById('team-pin').value;
-    const selectedTeam = window.pendingTeam;
-    if (TEAM_PINS[selectedTeam] === pin) {
-        currentTeam = selectedTeam;
-        localStorage.setItem('activeTeam', selectedTeam);
+    if (TEAM_CONFIG[selectedTeamTemp].pin === pin) {
+        currentTeam = selectedTeamTemp;
+        localStorage.setItem('activeTeam', currentTeam);
+        hidePinEntry();
+        showSection('dashboard');
         loadDashboard();
     } else {
-        alert("Wrong PIN!");
+        alert("🔒 Incorrect PIN!");
     }
 }
 
-// Teacher Admin Hidden Trigger
-let tapCount = 0;
-function handleAdminTap(e) {
+function logout() {
+    if(confirm("Logout? Progress is saved on this device.")) {
+        localStorage.removeItem('activeTeam');
+        location.reload();
+    }
+}
+
+/* ==========================================
+   GAME ENGINE
+   ========================================== */
+function loadDashboard() {
+    const container = document.getElementById('quest-container');
+    const completed = JSON.parse(localStorage.getItem('completedLevels') || "[]");
+    const userIcon = TEAM_CONFIG[currentTeam].icon;
+    
+    document.getElementById('user-team-display').innerText = `${userIcon} Team ${currentTeam}`;
+    container.innerHTML = "";
+
+    QUEST_DATA.forEach((quest, index) => {
+        const isDone = completed.includes(quest.id);
+        const card = document.createElement('div');
+        card.className = `quest-card ${isDone ? 'completed' : ''}`;
+        card.innerHTML = `
+            <h3>${quest.loc}</h3>
+            ${isDone ? '<p class="status">✅ COMPLETED</p>' : `
+                <input type="text" id="unlock-${quest.id}" placeholder="Enter Unlock Code">
+                <button onclick="unlockQuest(${quest.id})">Unlock Challenge</button>
+            `}
+            <div id="task-${quest.id}" style="display:none;" class="task-box">
+                <p>${quest.task}</p>
+                <textarea id="content-${quest.id}" placeholder="Type your answer or 'Shown to Teacher'"></textarea>
+                <button class="primary-btn" onclick="submitTask(${quest.id})">Finish & Sync</button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function unlockQuest(id) {
+    const input = document.getElementById(`unlock-${id}`).value.toUpperCase();
+    const quest = QUEST_DATA.find(q => q.id === id);
+    if (input === quest.code) {
+        document.getElementById(`task-${id}`).style.display = 'block';
+        document.getElementById(`unlock-${id}`).style.display = 'none';
+    } else {
+        alert("Wrong code! Search harder or ask the teacher.");
+    }
+}
+
+async function submitTask(id) {
+    const quest = QUEST_DATA.find(q => q.id === id);
+    const content = document.getElementById(`content-${id}`).value;
+    
+    const payload = {
+        team: currentTeam,
+        location: quest.loc,
+        taskType: "Quest",
+        content: content,
+        autoPoints: quest.auto
+    };
+
+    // Save locally immediately
+    const completed = JSON.parse(localStorage.getItem('completedLevels') || "[]");
+    completed.push(id);
+    localStorage.setItem('completedLevels', JSON.stringify(completed));
+
+    // Queue for sync
+    addToSyncQueue(payload);
+    alert("Saved! We will sync points when signal is found.");
+    loadDashboard();
+    checkFinalReveal(completed.length);
+}
+
+function checkFinalReveal(count) {
+    if (count === QUEST_DATA.length) {
+        alert("✨ LEGENDARY STATUS! ✨\nYour Final Clue Fragments combine to form:\n'The first key to the lost empire lies within the spirit of Karnataka.'");
+    }
+}
+
+/* ==========================================
+   SYNC & LEADERBOARD
+   ========================================== */
+function addToSyncQueue(payload) {
+    let queue = JSON.parse(localStorage.getItem('syncQueue') || "[]");
+    queue.push(payload);
+    localStorage.setItem('syncQueue', JSON.stringify(queue));
+    syncNow();
+}
+
+async function syncNow() {
+    if (!navigator.onLine) return;
+    
+    let queue = JSON.parse(localStorage.getItem('syncQueue') || "[]");
+    if (queue.length === 0) return;
+
+    for (const item of queue) {
+        try {
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(item)
+            });
+        } catch (e) { console.log("Sync failed, retrying later"); }
+    }
+    localStorage.setItem('syncQueue', "[]");
+}
+
+function startSyncInterval() {
+    setInterval(syncNow, 30000); // Try sync every 30 seconds
+}
+
+async function fetchLeaderboard() {
+    const tableBody = document.getElementById('leaderboard-body');
+    const spinner = document.getElementById('loading-spinner');
+    spinner.style.display = "block";
+    tableBody.innerHTML = "";
+
+    try {
+        const res = await fetch(GOOGLE_SCRIPT_URL + "?action=getLeaderboard");
+        const data = await res.json();
+        spinner.style.display = "none";
+        data.rankings.forEach((row, idx) => {
+            const icon = TEAM_CONFIG[row.team] ? TEAM_CONFIG[row.team].icon : "🚩";
+            tableBody.innerHTML += `<tr><td>${idx+1}</td><td>${icon} ${row.team}</td><td>${row.points}</td></tr>`;
+        });
+    } catch (e) {
+        spinner.innerText = "Check back once you have signal!";
+    }
+}
+
+/* ==========================================
+   TEACHER ADMIN
+   ========================================== */
+function handleAdminTap() {
     tapCount++;
     if (tapCount === 3) {
-        const pass = prompt("Enter Admin Password:");
+        const pass = prompt("Admin Password:");
         if (pass === "KARNATAKA2026") {
-            document.getElementById('admin-panel').style.display = 'block';
-            document.getElementById('login-screen').style.display = 'none';
+            showSection('admin-panel');
         }
         tapCount = 0;
     }
 }
 
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwus5oJWiCpHM-lODpl2Ttleq2vNb7ZPEnxeBYMgQ2NB6lc15at8NysJrE3ZLCq01NN/exec";
-
-async function fetchLeaderboard() {
-    const tableBody = document.getElementById('leaderboard-body');
-    const spinner = document.getElementById('loading-spinner');
-    
-    spinner.style.display = "block";
-    tableBody.innerHTML = "";
-
-    try {
-        // We add a 'getLeaderboard' parameter to our URL
-        const response = await fetch(GOOGLE_SCRIPT_URL + "?action=getLeaderboard");
-        const data = await response.json();
-        
-        spinner.style.display = "none";
-        
-        data.rankings.forEach((row, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${getTeamIcon(row.team)} ${row.team}</td>
-                <td><strong>${row.points}</strong></td>
-            `;
-            tableBody.appendChild(tr);
-        });
-    } catch (error) {
-        spinner.innerText = "Leaderboard currently offline. Check back later!";
-    }
-}
-
-function getTeamIcon(name) {
-    const icons = { "Indian Roller": "🐦", "Asian Elephant": "🐘", "Lotus": "🪷", "Sandalwood": "🪵", "Mango": "🥭" };
-    return icons[name] || "🚩";
-}
-
-function showSection(id) {
-    document.querySelectorAll('.page-section, #login-screen').forEach(s => s.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
-}
-function submitToTeacher(payload) {
-    fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors', // Important for cross-domain
-        cache: 'no-cache',
-        body: JSON.stringify(payload)
-    }).then(() => {
-        alert("Sent to teacher for approval! Keep exploring.");
-    }).catch(err => {
-        // If offline, save to a 'pending' list in LocalStorage to sync later
-        saveOffline(payload);
-    });
-}
-
-
 function resetAllTeams() {
-    if(confirm("This will wipe all scores and progress. Continue?")) {
+    if(confirm("⚠️ WIPE ALL DATA? This cannot be undone.")) {
         localStorage.clear();
         location.reload();
     }
+}
+
+function closeAdmin() {
+    showSection(currentTeam ? 'dashboard' : 'login-screen');
 }
