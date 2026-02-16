@@ -33,6 +33,13 @@ function showView(id) {
     document.getElementById(id).style.display = 'block';
 }
 
+function goBack() {
+    // Re-rendering the quests will show the site list 
+    // because we aren't "inside" a specific site anymore.
+    renderQuests();
+    // Scroll to the top so they see the full list
+    window.scrollTo(0, 0);
+}
 function initTeams() {
     const grid = document.getElementById('team-selector');
     grid.innerHTML = "";
