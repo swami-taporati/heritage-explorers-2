@@ -9,19 +9,12 @@ if ('serviceWorker' in navigator) {
 const GOOGLE_SCRIPT_URL = "YOUR_DEPLOYED_WEB_APP_URL";
 
 const TEAM_CONFIG = {
-    "Indian Roller": { pin: "4921", icon: "🐦" },
-    "Asian Elephant": { pin: "8374", icon: "🐘" },
-    "Lotus": { 
-        pin: "2569", 
-        icon: '<img src="https://img.icons8.com/color/96/lotus.png" class="team-img" alt="Lotus">' 
-    },
-    "Sandalwood": { 
-        pin: "7103", 
-        icon: '<img src="https://img.icons8.com/color/96/sandalwood.png" class="team-img" alt="Sandalwood">' 
-    },
-    "Mango": { pin: "6482", icon: "🥭" }
+    "Indian Roller": { pin: "4921", icon: '<img src="images/roller.png" class="team-img" alt="Roller">' },
+    "Asian Elephant": { pin: "8374", icon: '<img src="images/elephant.png" class="team-img" alt="Elephant">' },
+    "Lotus": { pin: "2569", icon: '<img src="images/lotus.png" class="team-img" alt="Lotus">' },
+    "Sandalwood": { pin: "7103", icon: '<img src="images/sandalwood.png" class="team-img" alt="Sandalwood">' },
+    "Mango": { pin: "6482", icon: '<img src="images/mango.png" class="team-img" alt="Mango">' }
 };
-
 const QUEST_DATA = [
     { id: 1, loc: "Bannerghatta", code: "WILD26", task: "PHOTO: Capture a herbivore and a carnivore. QUIZ: Which animal is the state animal?", auto: 10 },
     { id: 2, loc: "Music Museum", code: "RAGA", task: "VIDEO: Record a 10s clip of a team member playing a traditional instrument.", auto: 0 },
