@@ -23,6 +23,13 @@
             <span id="active-team-banner">Team Name</span>
             <div>Pts: <span id="my-pts">0</span></div>
         </div>
+        <div id="leaderboard-section" style="margin-top:20px; border-top: 2px solid #ddd; padding-top:10px;">
+    <h3>Live Leaderboard</h3>
+    <div id="leaderboard-container">
+        <p>Loading scores...</p>
+    </div>
+    <button class="quiz-opt" onclick="updateLeaderboard()">🔄 Refresh Scores</button>
+</div>
         <div class="controls">
             <button class="sync-btn" onclick="syncData()">🔄 Sync Challenges</button>
         </div>
