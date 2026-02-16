@@ -1,30 +1,162 @@
-:root { --primary: #C80E13; --accent: #F2D53C; --bg: #f4f1ea; --dark: #333; }
-body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; color: var(--dark); }
-header { background: var(--primary); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--accent); }
-h1 { font-family: 'Cinzel', serif; font-size: 1rem; margin: 0; }
+:root {
+    --primary: #2c3e50;
+    --accent: #f39c12;
+    --light: #f4f4f9;
+    --dark: #1a1a1a;
+    --success: #27ae60;
+    --danger: #e74c3c;
+}
 
-.section-title { margin-top: 20px; font-family: 'Cinzel', serif; }
-.team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-.team-btn { background: white; border: 2px solid var(--dark); padding: 20px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-.team-icon { width: 50px; height: 50px; margin-bottom: 10px; }
+body {
+    font-family: 'Fauna One', serif;
+    background-color: var(--light);
+    margin: 0;
+    color: var(--dark);
+}
 
-.quest-card { background: white; margin: 15px; padding: 15px; border-radius: 12px; border-left: 6px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-.task-item { background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #ddd; }
-.locked-task { opacity: 0.6; background: #e0e0e0 !important; pointer-events: none; border: 1px dashed #999; }
+h1, h2, h3 {
+    font-family: 'Cinzel', serif;
+    text-align: center;
+}
 
-.quiz-opt { display: block; width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 6px; background: white; text-align: left; }
-.submit-btn { width: 100%; background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; margin-top: 10px; }
-.primary-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; }
-.danger-btn { background: #d32f2f; color: white; border: none; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
+.header-box {
+    background: var(--primary);
+    color: white;
+    padding: 20px 10px;
+    margin-bottom: 20px;
+}
 
-.puzzle-log { background: #222; color: #0f0; font-family: monospace; padding: 10px; border-radius: 5px; margin: 10px 0; max-height: 80px; overflow-y: auto; font-size: 0.8rem; }
-.sync-btn { position: fixed; bottom: 20px; right: 20px; background: var(--dark); color: white; border: none; padding: 15px 20px; border-radius: 50px; font-weight: bold; z-index: 100; }
-.clue-display {    background: #fff9c4;    padding: 10px;    border-radius: 6px;    border-left: 4px solid #fbc02d;    font-size: 0.9rem;}
+/* 1. TEAM SELECTION GRID */
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 20px;
+}
 
+.team-btn {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+}
 
-.puzzle-log {     background: #1a1a1a;    color: #43a047;    font-family: 'Courier New', Courier, monospace;    padding: 10px;    border-radius: 6px;    margin: 10px 0;    font-size: 0.8rem;   max-height: 120px;    overflow-y: auto;}
+.team-icon {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: 8px;
+}
 
-.upload-label {    display: block;    background: #e3f2fd;    padding: 15px;    border-radius: 8px;    color: #1565c0;    font-weight: 600;    margin: 10px 0;}
-.modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index: 1000; }
-.modal-content { background:white; padding:30px; border-radius:15px; width:85%; max-width:400px; text-align: center; }
-#pin-input { width: 100%; font-size: 2rem; text-align: center; margin: 20px 0; border-radius: 8px; border: 1px solid #ccc; }
+.team-label {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* 2. TEAM BANNER (MAIN VIEW) */
+.team-banner {
+    background: var(--accent);
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+/* 3. QUEST CARDS */
+.quest-card {
+    background: white;
+    margin: 15px;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 5px solid var(--primary);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.finale-card {
+    border-left-color: #ffd700;
+    background: #fffdf0;
+}
+
+.task-item {
+    border-top: 1px solid #eee;
+    padding: 15px 0;
+    margin-top: 10px;
+}
+
+.locked-task {
+    opacity: 0.6;
+    background: #f9f9f9;
+    pointer-events: none;
+}
+
+/* 4. INPUTS & BUTTONS */
+.quiz-opt, .submit-btn, .sync-btn, .clue-btn {
+    width: 100%;
+    padding: 12px;
+    margin: 5px 0;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.submit-btn { background: var(--primary); color: white; border: none; }
+.sync-btn { background: var(--success); color: white; border: none; font-weight: bold; }
+.clue-btn { background: #eee; color: #333; }
+.admin-btn { background: none; border: none; color: #777; width: 100%; margin-top: 20px; }
+
+/* 5. SPECIAL DISPLAYS */
+.clue-display {
+    background: #fff9c4;
+    padding: 10px;
+    border-radius: 6px;
+    border-left: 4px solid #fbc02d;
+    font-size: 0.9rem;
+}
+
+.puzzle-log {
+    background: var(--dark);
+    color: #00ff00;
+    font-family: monospace;
+    padding: 10px;
+    border-radius: 6px;
+    margin: 10px 0;
+    font-size: 0.8rem;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+/* 6. PIN MODAL */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 80%;
+    text-align: center;
+}
+
+.logout-btn {
+    background: none;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    margin: 30px auto;
+    display: block;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
