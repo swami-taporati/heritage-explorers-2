@@ -78,6 +78,10 @@ function renderQuests() {
         const isUnlocked = localStorage.getItem(`unlock_${site}`);
         const card = document.createElement('div');
         card.className = "quest-card";
+         if (site === "Grand Finale") {
+         card.style.borderLeft = "6px solid #FFD700"; // Gold border for the finale
+         card.style.background = "#fffdf0";
+                       }
         
         if (!isUnlocked) {
             card.innerHTML = `<h3>${site}</h3>
