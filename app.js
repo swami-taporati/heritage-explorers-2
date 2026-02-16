@@ -7,7 +7,13 @@ const TEAM_CONFIG = {
     "Sandalwood": { pin: "7103", icon: '<img src="images/sandalwood.png">' },
     "Mango": { pin: "6482", icon: '<img src="images/mango.png">' }
 };
-
+const DRIVE_LINKS = {
+    "Indian Roller": "https://drive.google.com/drive/folders/1Awv_3NvjvPhbnYXyZ-iELT3RA-SZdOBy?usp=sharing",
+    "Asian Elephant": "https://drive.google.com/drive/folders/17FiZFV9g_5xfys1Parn8ZSD50aozR9l5?usp=sharing",
+    "Lotus": "https://drive.google.com/drive/folders/1O4N5IMxpN25aXuK33A608KxFGcixT3WE?usp=sharing",
+    "Sandalwood": "https://drive.google.com/drive/folders/1-qX4XPk6XCogJK9Wg13gfBeMFFtTMcdB?usp=sharing",
+    "Mango": "https://drive.google.com/drive/folders/1a15Jo6htUwOtEhaYZrd_hSOQXm6Sp0bl?usp=sharing"
+};
 const QUEST_DATA = [
     { id: 1, loc: "Bannerghatta", code: "WILD26", task: "PHOTO: Capture a herbivore and a carnivore (safari).", quiz: { q: "Which animal is the state animal of Karnataka?", o: ["Bengal Tiger", "Asian Elephant", "Indian Roller", "Leopard"], a: 1 }, auto: 10 },
     { id: 2, loc: "Music Museum", code: "RAGA", task: "VIDEO: Record a clip of a team member trying an instrument.", quiz: { q: "Which instrument is famously seen in the museum?", o: ["Veena", "Flute", "Tabla", "Drums"], a: 0 }, auto: 10 },
