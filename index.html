@@ -5,47 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Heritage Explorers 2</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header onclick="handleAdminTap(event)">
+
+    <header onclick="handleAdminTap()">
         <h1 id="app-title">HERITAGE EXPLORERS II</h1>
+        <p id="sub-title">Karnataka Expedition 2026</p>
     </header>
 
+    <nav id="main-nav" style="display:none;">
+        <button onclick="showSection('dashboard')">🏰 Quests</button>
+        <button onclick="showSection('leaderboard-section'); fetchLeaderboard();">🏆 Rankings</button>
+    </nav>
+
     <main id="app">
-        <section id="login-screen">
-            <h2>Select Team</h2>
+        <section id="login-screen" class="active-section">
+            <h2 class="section-title">Enlist Your Team</h2>
             <div class="team-grid">
-                <div class="team-card" onclick="showPinEntry('Indian Roller', '🐦')">🐦 Roller</div>
-                <div class="team-card" onclick="showPinEntry('Asian Elephant', '🐘')">🐘 Gaja</div>
-                <div class="team-card" onclick="showPinEntry('Lotus', '🪷')">🪷 Kamal</div>
-                <div class="team-card" onclick="showPinEntry('Sandalwood', '🪵')">🪵 Shrigandha</div>
-                <div class="team-card" onclick="showPinEntry('Mango', '🥭')">🥭 Amra</div>
+                <div class="team-card" onclick="prepLogin('Indian Roller', '🐦')"><span>🐦</span><br>Roller</div>
+                <div class="team-card" onclick="prepLogin('Asian Elephant', '🐘')"><span>🐘</span><br>Gaja</div>
+                <div class="team-card" onclick="prepLogin('Lotus', '🪷')"><span>🪷</span><br>Kamal</div>
+                <div class="team-card" onclick="prepLogin('Sandalwood', '🪵')"><span>🪵</span><br>Shrigandha</div>
+                <div class="team-card" onclick="prepLogin('Mango', '🥭')"><span>🥭</span><br>Amra</div>
             </div>
             
-            <div id="pin-modal" style="display:none;">
-                <input type="password" id="team-pin" placeholder="Enter Team PIN">
-                <button onclick="login()">Enter</button>
-                <button class="back-btn" onclick="hidePinEntry()">Back</button>
+            <div id="pin-modal" class="modal" style="display:none;">
+                <div class="modal-content">
+                    <h3 id="modal-team-name"></h3>
+                    <input type="tel" id="team-pin" placeholder="4-Digit PIN" maxlength="4">
+                    <div class="modal-btns">
+                        <button class="primary-btn" onclick="login()">Enter</button>
+                        <button class="secondary-btn" onclick="hidePinEntry()">Back</button>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section id="dashboard" style="display:none;">
-            <div class="team-header">
-                <span id="user-team-icon"></span> <span id="user-team-name"></span>
-                <button class="back-btn" onclick="logout()">Logout</button>
+        <section id="dashboard" class="page-section" style="display:none;">
+            <div class="status-bar">
+                <span id="user-team-display"></span>
+                <button class="small-btn" onclick="logout()">Logout</button>
             </div>
-            
-            <div id="quest-list">
+            <div id="quest-container">
                 </div>
         </section>
 
-        <section id="admin-panel" style="display:none;">
-            <h2>Teacher Dashboard</h2>
-            <button onclick="resetAllTeams()">Reset Game for All</button>
-            <button onclick="addCustomChallenge()">+ Add Dynamic Challenge</button>
-            <div id="submission-queue">
-                </div>
-            <button class="back-btn" onclick="closeAdmin()">Close Admin</button>
+        <section id="leaderboard-section" class="page-section" style="display:none;">
+            <h2 class="section-title">Current Standings</h2>
+            <div id="loading-spinner">Fetching scores...</div>
+            <table id="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Team</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    </tbody>
+            </table>
+            <button class="refresh-btn" onclick="fetchLeaderboard()">🔄 Refresh Scores</button>
+        </section>
+
+        <section id="admin-panel" class="page-section" style="display:none;">
+            <h2 class="section-title">Teacher Command</h2>
+            <div class="admin-controls">
+                <button class="danger-btn" onclick="resetAllTeams()">⚠️ Reset Entire Game</button>
+                <button class="primary-btn" onclick="addDynamicQuest()">➕ Add Surprise Task</button>
+            </div>
+            <button class="secondary-btn" onclick="closeAdmin()">Return to Game</button>
         </section>
     </main>
 
