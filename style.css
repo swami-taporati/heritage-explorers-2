@@ -14,6 +14,14 @@ body { font-family: 'Fauna One', serif; margin: 0; background: var(--light); }
 .modal-content { background: white; padding: 25px; border-radius: 15px; width: 80%; text-align: center; }
 .admin-btn { background: none; border: none; color: #888; width: 100%; margin: 20px 0; }
 .locked-task { opacity: 0.5; pointer-events: none; }
+.winner-glow {    background: linear-gradient(90deg, #fff7ad, #ffa500) !important;    border: 2px solid gold;    font-weight: bold;    animation: celebrate 1s infinite alternate;}
+
+@keyframes celebrate {
+    from { transform: scale(1); }
+    to { transform: scale(1.02); }
+}
+
+.score-row {    display: flex;    justify-content: space-between;    padding: 10px;    margin: 5px 0;    background: white;    border-radius: 5px;}
 .quiz-opt:active {    transform: scale(0.95);    background-color: #e0e0e0;}
 /* Add a loading pulse animation */
 @keyframes pulse {    0% { opacity: 1; }    50% { opacity: 0.5; }    100% { opacity: 1; }}
