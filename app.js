@@ -136,8 +136,42 @@ async function sendSubmission(payload) {
 
 function submitQuiz(id, site, idx) {
     const t = challenges.find(x => x.TaskID === id);
-    const pts = (idx == t.CorrectAns) ? parseInt(t.Points) : 0;
-    sendSubmission({ team: userTeam, site: site, taskId: id, type: 'quiz', content: `Selected: ${idx}`, autoPts: pts });
+    const container = document.querySelector(`[onclick*="${id}"]`).parentElement;
+    const buttons = container.querySelectorAll('.quiz-opt');
+    
+    // 1. Visual Feedback: Highlight the selected button
+    buttons.forEach((btn, i) => {
+        btn.disabled = true; // Prevent double-clicking
+        if (i === idx) {
+            btn.style.background = "var(--accent)";
+            btn.style.color = "white";
+            btn.innerText = "Selected...";
+        } else {
+            btn.style.opacity = "0.5";
+        }
+    });
+
+    // 2. Tiny delay so the student sees their choice
+    setTimeout(() => {
+        const isCorrect = (idx == t.CorrectAns);
+        const pts = isCorrect ? parseInt(t.Points) : 0;
+        
+        if (isCorrect) {
+            alert("🌟 Correct! +" + pts + " points.");
+        } else {
+            alert("❌ Incorrect. 0 points assigned.");
+        }
+        
+        // 3. Send to Google Sheets
+        sendSubmission({ 
+            team: userTeam, 
+            site: site, 
+            taskId: id, 
+            type: 'quiz', 
+            content: `Picked: ${idx}`, 
+            autoPts: pts 
+        });
+    }, 600); // 0.6 second delay
 }
 
 function nextClue(id, cluesStr) {
