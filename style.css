@@ -114,3 +114,18 @@ button {
     border: 3px solid var(--kn-yellow);
     width: 80%;
 }
+
+.team-img {
+    width: 40px;      /* Adjust size for mobile buttons */
+    height: 40px;
+    vertical-align: middle;
+    margin-right: 8px;
+    object-fit: contain;
+}
+
+/* Specific styling for the Sandalwood and Lotus cards on the login screen */
+.team-card img {
+    width: 60px;      /* Larger for the initial selection screen */
+    height: 60px;
+    margin-bottom: 10px;
+}
