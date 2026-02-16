@@ -92,7 +92,7 @@ function loadDashboard() {
     const completed = JSON.parse(localStorage.getItem('completedLevels') || "[]");
     const userIcon = TEAM_CONFIG[currentTeam].icon;
     
-    document.getElementById('user-team-display').innerText = `${userIcon} Team ${currentTeam}`;
+    document.getElementById('user-team-display').innerHTML = `${userIcon} Team ${currentTeam}`;
     container.innerHTML = "";
 
     QUEST_DATA.forEach((quest, index) => {
@@ -198,10 +198,17 @@ async function fetchLeaderboard() {
         const res = await fetch(GOOGLE_SCRIPT_URL + "?action=getLeaderboard");
         const data = await res.json();
         spinner.style.display = "none";
-        data.rankings.forEach((row, idx) => {
-            const icon = TEAM_CONFIG[row.team] ? TEAM_CONFIG[row.team].icon : "🚩";
-            tableBody.innerHTML += `<tr><td>${idx+1}</td><td>${icon} ${row.team}</td><td>${row.points}</td></tr>`;
-        });
+     data.rankings.forEach((row, idx) => {
+    // This fetches the <img> tag from your TEAM_CONFIG
+    const iconHtml = TEAM_CONFIG[row.team] ? TEAM_CONFIG[row.team].icon : "🚩";
+    
+    tableBody.innerHTML += `
+        <tr>
+            <td>${idx + 1}</td>
+            <td>${iconHtml} ${row.team}</td>
+            <td>${row.points}</td>
+        </tr>`;
+});
     } catch (e) {
         spinner.innerText = "Check back once you have signal!";
     }
