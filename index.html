@@ -46,7 +46,7 @@
         </div>
     </section>
 
-   <section id="admin-view" style="display:none">
+  <section id="admin-view" style="display:none">
     <div class="header-box">
         <h2>Teacher HQ</h2>
         <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px;">
@@ -55,14 +55,24 @@
         </div>
     </div>
 
-    <div id="admin-scores" style="margin: 15px; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <h3 style="margin-top:0; font-size: 0.9em; color: var(--primary);">📊 Current Standings</h3>
+    <div style="margin: 15px; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="margin:0; font-size: 0.9em; color: var(--primary);">📊 Current Standings</h3>
+            <button onclick="updateAdminLeaderboard()" style="background:none; border:none; color:blue; font-size:0.8em; cursor:pointer;">🔄 Refresh</button>
+        </div>
         <div id="admin-leaderboard-container" style="font-size: 0.85em;"></div>
     </div>
     
     <div id="pending-list" class="admin-list"></div>
     
-    </section>
+    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+    
+    <div style="padding: 10px; text-align: center;">
+        <button class="primary-btn" style="background: gold; color: black; margin-bottom: 15px;" onclick="triggerFinalReveal()">🏆 SHOW FINAL WINNER</button>
+        <br>
+        <button class="danger-btn" onclick="triggerGlobalReset()">🚨 Reset Global Sheet</button>
+    </div>
+</section>
         
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
         
