@@ -1,5 +1,4 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyH0ey1aVqAx2byXwg8IByOnOJUu-nJOBFGH6YXoQqNRRoAAdVswp7Rs0SbPIg7tzq9Sg/exec";
-const SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
 
 const TEAMS = {
     "Indian Roller": { pin: "4921" },
