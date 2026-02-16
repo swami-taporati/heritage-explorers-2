@@ -48,6 +48,53 @@ function initTeams() {
     });
 }
 
+async function approveTask(row) {
+    const pts = document.getElementById(`pts-${row}`).value;
+    if (!pts) return alert("Enter points first!");
+
+    const payload = {
+        action: "grade",
+        row: row,
+        pts: parseInt(pts)
+    };
+
+    try {
+        // We use POST to send the grading instruction
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        alert("Success! Points assigned.");
+        renderPending(); // Refresh the list
+    } catch (e) {
+        alert("Grading failed.");
+    }
+}
+async function renderPending() {
+    const list = document.getElementById('pending-list');
+    list.innerHTML = "<p style='text-align:center'>Loading submissions...</p>";
+    
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=getPending`);
+        const pending = await res.json();
+        
+        if (pending.length === 0) {
+            list.innerHTML = "<p style='text-align:center'>No pending approvals! 🎉</p>";
+            return;
+        }
+
+        list.innerHTML = pending.map(item => `
+            <div class="quest-card" style="border-left-color: var(--accent)">
+                <p><strong>Team:</strong> ${item.team}</p>
+                <p><strong>Site:</strong> ${item.loc} (${item.type})</p>
+                <p><strong>Content:</strong> ${item.content}</p>
+                <div style="display:flex; gap:10px;">
+                    <input type="number" id="pts-${item.row}" placeholder="Points" style="width:80px">
+                    <button class="submit-btn" onclick="approveTask(${item.row})">Approve</button>
+                </div>
+            </div>
+        `).join("");
+    } catch (e) {
+        list.innerHTML = "<p>Error loading pending tasks.</p>";
+    }
+}
 function openPin(team) {
     selectedTeamTemp = team;
     document.getElementById('target-team').innerText = team;
@@ -212,8 +259,12 @@ function submitManual(id, site, type) {
 
 function logout() { localStorage.removeItem('team'); location.reload(); }
 
-function openAdmin() {
-    if (prompt("Admin Pass:") === "KARNATAKA2026") showView('admin-view');
+async function openAdmin() {
+    const pass = prompt("Admin Pass:");
+    if (pass === "KARNATAKA2026") {
+        showView('admin-view');
+        renderPending();
+    }
 }
 
 function resetGameForUser() {
