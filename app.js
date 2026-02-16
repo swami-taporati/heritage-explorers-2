@@ -75,6 +75,7 @@ async function syncData() {
     setTimeout(() => { if(btn) btn.innerText = "🔄 Sync Challenges"; }, 2000);
 }
 
+
 function renderQuests() {
     const cont = document.getElementById('quest-container');
     if(!cont) return;
@@ -278,20 +279,82 @@ function logout() { localStorage.removeItem('team'); location.reload(); }
 function openAdmin() { if (prompt("Pass:") === "KARNATAKA2026") { showView('admin-view'); renderPending(); } }
 
 async function renderPending() {
-    const res = await fetch(`${SCRIPT_URL}?action=getPending`);
-    const data = await res.json();
-    document.getElementById('pending-list').innerHTML = data.map(i => `
-        <div class="quest-card">
-            <p><strong>${i.team}</strong>: ${i.content}</p>
-            <input type="number" id="p-${i.row}" placeholder="Pts" style="width:60px">
-            <button onclick="approveTask(${i.row})">Approve</button>
-        </div>`).join("");
+    const list = document.getElementById('pending-list');
+    list.innerHTML = "<p style='text-align:center;'>⏳ Fetching submissions...</p>";
+    
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=getPending`);
+        const data = await res.json();
+        
+        if (data.length === 0) {
+            list.innerHTML = "<p style='text-align:center; padding:20px;'>🎉 No pending approvals!</p>";
+            return;
+        }
+
+        list.innerHTML = data.map(i => `
+            <div class="quest-card" id="row-${i.row}" style="border-left: 5px solid gold;">
+                <p><strong>Team:</strong> ${i.team} | <strong>Task:</strong> ${i.taskId}</p>
+                <p style="background: #f0f0f0; padding: 8px; border-radius: 4px;">"${i.content}"</p>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="number" id="p-${i.row}" placeholder="Pts" style="width:70px; margin:0;">
+                    <button id="btn-${i.row}" onclick="approveTask(${i.row})" class="submit-btn" style="margin:0; background: #27ae60;">Approve</button>
+                </div>
+            </div>`).join("");
+    } catch (e) {
+        list.innerHTML = "<p>Error loading pending tasks. Check internet.</p>";
+    }
 }
 
 async function approveTask(row) {
     const pts = document.getElementById(`p-${row}`).value;
-    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "grade", row: row, pts: pts })});
-    renderPending();
+    const btn = document.getElementById(`btn-${row}`);
+    const card = document.getElementById(`row-${row}`);
+
+    if (!pts) return alert("Please enter points first!");
+
+    // INSTANT FEEDBACK
+    btn.innerText = "⏳ Sending...";
+    btn.style.background = "#95a5a6";
+    btn.disabled = true;
+
+    try {
+        await fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify({ action: "grade", row: row, pts: pts }) 
+        });
+        
+        // SUCCESS FEEDBACK
+        card.style.transition = "0.5s";
+        card.style.opacity = "0.3";
+        card.style.transform = "translateX(100%)";
+        
+        setTimeout(() => {
+            card.remove();
+            if (document.querySelectorAll('.admin-list .quest-card').length === 0) {
+                renderPending(); // Refresh to show "No pending approvals"
+            }
+        }, 500);
+    } catch (e) {
+        alert("Failed to approve. Try again.");
+        btn.innerText = "Approve";
+        btn.style.background = "#27ae60";
+        btn.disabled = false;
+    }
 }
 
+// Global Reset Function for Teacher HQ
+async function triggerGlobalReset() {
+    if (!confirm("🚨 WARNING: This will delete ALL student submissions from the Google Sheet. Use only for practice runs!")) return;
+    if (prompt("Type 'RESET' to confirm:") !== "RESET") return;
+
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=resetGame`);
+        const msg = await res.text();
+        alert(msg);
+        location.reload();
+    } catch (e) {
+        alert("Reset failed. Check Script permissions.");
+    }
+}
 function resetGameForUser() { if(confirm("Clear local device?")) { localStorage.clear(); location.reload(); } }
