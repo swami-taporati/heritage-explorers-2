@@ -1,186 +1,115 @@
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwus5oJWiCpHM-lODpl2Ttleq2vNb7ZPEnxeBYMgQ2NB6lc15at8NysJrE3ZLCq01NN/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyH0ey1aVqAx2byXwg8IByOnOJUu-nJOBFGH6YXoQqNRRoAAdVswp7Rs0SbPIg7tzq9Sg/exec";
 
-const TEAM_CONFIG = {
-    "Indian Roller": { pin: "4921", icon: '<img src="images/roller.png">' },
-    "Asian Elephant": { pin: "8374", icon: '<img src="images/elephant.png">' },
-    "Lotus": { pin: "2569", icon: '<img src="images/lotus.png">' },
-    "Sandalwood": { pin: "7103", icon: '<img src="images/sandalwood.png">' },
-    "Mango": { pin: "6482", icon: '<img src="images/mango.png">' }
-};
-const DRIVE_LINKS = {
-    "Indian Roller": "https://drive.google.com/drive/folders/1Awv_3NvjvPhbnYXyZ-iELT3RA-SZdOBy?usp=sharing",
-    "Asian Elephant": "https://drive.google.com/drive/folders/17FiZFV9g_5xfys1Parn8ZSD50aozR9l5?usp=sharing",
-    "Lotus": "https://drive.google.com/drive/folders/1O4N5IMxpN25aXuK33A608KxFGcixT3WE?usp=sharing",
-    "Sandalwood": "https://drive.google.com/drive/folders/1-qX4XPk6XCogJK9Wg13gfBeMFFtTMcdB?usp=sharing",
-    "Mango": "https://drive.google.com/drive/folders/1a15Jo6htUwOtEhaYZrd_hSOQXm6Sp0bl?usp=sharing"
-};
-const QUEST_DATA = [
-    { id: 1, loc: "Bannerghatta", code: "WILD26", task: "PHOTO: Capture a herbivore and a carnivore (safari).", quiz: { q: "Which animal is the state animal of Karnataka?", o: ["Bengal Tiger", "Asian Elephant", "Indian Roller", "Leopard"], a: 1 }, auto: 10 },
-    { id: 2, loc: "Music Museum", code: "RAGA", task: "VIDEO: Record a clip of a team member trying an instrument.", quiz: { q: "Which instrument is famously seen in the museum?", o: ["Veena", "Flute", "Tabla", "Drums"], a: 0 }, auto: 10 },
-    { id: 3, loc: "Hampi (Virupaksha)", code: "RAYA", task: "PHOTO: Find the 'Inverted Shadow' of the gopuram.", quiz: { q: "Hampi was capital of which empire?", o: ["Mughal", "Vijayanagara", "Chola", "Maratha"], a: 1 }, auto: 10 },
-    { id: 4, loc: "Hampi (Vittala)", code: "CHARIOT", task: "PHOTO: Group pose at the Stone Chariot.", quiz: { q: "What's unique about the Vittala pillars?", o: ["Made of gold", "They sing", "100ft tall", "Moving"], a: 1 }, auto: 10 },
-    { id: 5, loc: "JSW Kaladham", code: "STEEL", task: "PHOTO: Creative selfie with 3D Hampi exhibits.", quiz: { q: "What does JSW Vidyanagar produce?", o: ["Silk", "Coffee", "Steel", "Cotton"], a: 2 }, auto: 10 },
-    { id: 6, loc: "Chitradurga", code: "OBAVVA", task: "VIDEO: Explain the legend of Obavva at the 'secret opening'.", quiz: { q: "How many walls (Saptapadi) does the fort have?", o: ["3", "5", "7", "9"], a: 2 }, auto: 10 },
-    { id: 7, loc: "Agumbe", code: "RAIN", task: "IDENTIFY: Name a medicinal plant used by local farmers.", quiz: { q: "Agumbe is the ____ of South India.", o: ["Ooty", "Cherrapunji", "Kashmir", "Mysuru"], a: 1 }, auto: 10 },
-    { id: 8, loc: "Sringeri", code: "SHARADA", task: "PHOTO: The zodiac pillars (Rashistambhas).", quiz: { q: "Which river flows beside the temple?", o: ["Tunga", "Kaveri", "Krishna", "Ganga"], a: 0 }, auto: 10 },
-    { id: 9, loc: "Kambala", code: "BUFFALO", task: "PHOTO/VIDEO: Re-enact the racing posture.", quiz: { q: "Kambala involves racing which animal?", o: ["Horses", "Bulls", "Buffaloes", "Camels"], a: 2 }, auto: 10 }
-];
-
-let currentTeam = localStorage.getItem('activeTeam') || null;
-let selectedTeamTemp = "";
-
-// Initialize
-window.onload = () => { 
-    if (currentTeam) { 
-        showSection('dashboard'); 
-        loadDashboard(); 
-        updateMyTeamScore();
-    } 
+const TEAMS = {
+    "Roller": { pin: "4921", drive: "LINK1" },
+    "Gaja": { pin: "8374", drive: "LINK2" },
+    "Kamal": { pin: "2569", drive: "LINK3" },
+    "Shrigandha": { pin: "7103", drive: "LINK4" },
+    "Amra": { pin: "6482", drive: "LINK5" }
 };
 
-function showSection(id) {
-    document.querySelectorAll('.page-section, #login-screen').forEach(s => s.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
-    document.getElementById('main-nav').style.display = currentTeam ? 'flex' : 'none';
-}
+let userTeam = localStorage.getItem('team');
+let challenges = JSON.parse(localStorage.getItem('challenges') || "[]");
 
-// LOGIN LOGIC
-function prepLogin(team) { selectedTeamTemp = team; document.getElementById('modal-team-name').innerText = "Team " + team; document.getElementById('pin-modal').style.display = 'flex'; }
-function hidePinEntry() { document.getElementById('pin-modal').style.display = 'none'; document.getElementById('team-pin').value = ""; }
+window.onload = () => {
+    initTeams();
+    if (userTeam) {
+        document.getElementById('login-view').style.display = 'none';
+        document.getElementById('main-view').style.display = 'block';
+        document.getElementById('score-display').style.display = 'block';
+        renderQuests();
+    }
+};
 
-function login() {
-    const pin = document.getElementById('team-pin').value;
-    if (TEAM_CONFIG[selectedTeamTemp].pin === pin) {
-        currentTeam = selectedTeamTemp;
-        localStorage.setItem('activeTeam', currentTeam);
-        location.reload();
-    } else { alert("Incorrect PIN!"); }
-}
-
-function logout() { localStorage.removeItem('activeTeam'); location.reload(); }
-
-// GAMEPLAY
-function loadDashboard() {
-    const container = document.getElementById('quest-container');
-    const completed = JSON.parse(localStorage.getItem('completedLevels') || "[]");
-    
-    document.getElementById('user-team-display').innerHTML = `${TEAM_CONFIG[currentTeam].icon} <span>${currentTeam}</span>`;
-    
-    container.innerHTML = `
-        <div class="drive-box">
-            <p>📁 Step 1: Upload media to your folder</p>
-            <a href="${DRIVE_LINKS[currentTeam]}" target="_blank" class="drive-btn">Open Team Drive</a>
-        </div>
-    `;
-
-    QUEST_DATA.forEach(q => {
-        const isDone = completed.includes(q.id);
-        const card = document.createElement('div');
-        card.className = "quest-card";
-        card.innerHTML = isDone ? `<h3>${q.loc}</h3><p style="color:#2e7d32;font-weight:bold;">✅ CHALLENGE COMPLETE</p>` : `
-            <h3>${q.loc}</h3>
-            <div id="lock-${q.id}">
-                <input type="text" id="code-${q.id}" placeholder="Unlock Code" class="media-input">
-                <button class="primary-btn" onclick="unlock(${q.id})">Unlock Site</button>
-            </div>
-            <div id="task-${q.id}" style="display:none;" class="task-area">
-                <p><strong>📸 Step 2: Task</strong><br>${q.task}</p>
-                <label class="upload-confirm">
-                    <input type="checkbox" id="media-check-${q.id}"> I have uploaded the photo/video to Drive
-                </label>
-                <hr>
-                <p><strong>🧠 Step 3: Quiz</strong><br>${q.quiz.q}</p>
-                ${q.quiz.o.map((opt, i) => `<label class="quiz-opt"><input type="radio" name="q-${q.id}" value="${i}"> ${opt}</label>`).join('')}
-                <button class="submit-btn" onclick="submit(${q.id})">Finalize & Sync</button>
-            </div>`;
-        container.appendChild(card);
+function initTeams() {
+    const grid = document.getElementById('team-selector');
+    Object.keys(TEAMS).forEach(t => {
+        grid.innerHTML += `<div class="team-btn" onclick="openPin('${t}')">${t}</div>`;
     });
 }
 
-function unlock(id) {
-    const code = document.getElementById(`code-${id}`).value.toUpperCase();
-    if (code === QUEST_DATA.find(q => q.id === id).code) {
-        document.getElementById(`task-${id}`).style.display = "block";
-        document.getElementById(`lock-${id}`).style.display = "none";
-    } else { alert("Wrong code!"); }
+async function syncData() {
+    const res = await fetch(`${SCRIPT_URL}?action=sync`);
+    challenges = await res.json();
+    localStorage.setItem('challenges', JSON.stringify(challenges));
+    renderQuests();
 }
 
-async function submit(id) {
-    const q = QUEST_DATA.find(x => x.id === id);
-    const sel = document.querySelector(`input[name="q-${id}"]:checked`);
-    const isUploaded = document.getElementById(`media-check-${id}`).checked;
-
-    if (!sel) return alert("Please answer the quiz!");
-    if (!isUploaded) return alert("Please check the box to confirm you uploaded the media!");
-
-    let pts = (parseInt(sel.value) === q.quiz.a) ? q.auto : 0;
+function renderQuests() {
+    const cont = document.getElementById('quest-container');
+    cont.innerHTML = "";
     
-    const comp = JSON.parse(localStorage.getItem('completedLevels') || "[]");
-    comp.push(id);
-    localStorage.setItem('completedLevels', JSON.stringify(comp));
+    // Group by Site
+    const sites = [...new Set(challenges.map(c => c.Site))];
     
-    const payload = { 
-        team: currentTeam, 
-        location: q.loc, 
-        taskType: "Quest", 
-        content: `Media Uploaded: YES | Ans: ${q.quiz.o[sel.value]}`, 
-        autoPoints: pts 
-    };
-
-    alert(pts > 0 ? "Correct Quiz! +10 Pts." : "Task Submitted.");
-
-    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
-    .then(() => {
-        loadDashboard();
-        updateMyTeamScore();
+    sites.forEach(site => {
+        const isUnlocked = localStorage.getItem(`unlock_${site}`);
+        const siteHtml = document.createElement('div');
+        siteHtml.className = "quest-card";
+        
+        if (!isUnlocked) {
+            siteHtml.innerHTML = `<h3>${site}</h3>
+                <input type="text" id="code-${site}" placeholder="Enter Site Code">
+                <button onclick="unlockSite('${site}')">Unlock</button>`;
+        } else {
+            siteHtml.innerHTML = `<h3>${site}</h3>`;
+            challenges.filter(c => c.Site === site).forEach(t => {
+                siteHtml.appendChild(createTaskUI(t));
+            });
+        }
+        cont.appendChild(siteHtml);
     });
 }
-// DATA SYNC
-async function updateMyTeamScore() {
-    try {
-        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getTeamScore&team=${currentTeam}`);
-        const data = await res.json();
-        document.getElementById('team-live-score').innerText = data.score;
-    } catch (e) { document.getElementById('team-live-score').innerText = "?"; }
+
+function createTaskUI(t) {
+    const div = document.createElement('div');
+    const isDone = localStorage.getItem(`done_${t.TaskID}`);
+    div.className = `task-item ${isDone ? 'locked-task' : ''}`;
+    
+    if (isDone) {
+        div.innerHTML = `<p>✅ ${t.Question}</p>`;
+        return div;
+    }
+
+    switch(t.Type) {
+        case 'quiz':
+            const opts = t.Options_Clues.split(",");
+            div.innerHTML = `<p>${t.Question}</p>` + opts.map((o,i) => 
+                `<button class="quiz-opt" onclick="submitQuiz('${t.TaskID}','${t.Site}',${i},${t.Answer_Pts})">${o}</button>`).join("");
+            break;
+        case 'clue':
+            const clues = t.Options_Clues.split("|");
+            div.innerHTML = `<p id="text-${t.TaskID}">${clues[0]}</p>
+                <button class="clue-btn" onclick="nextClue('${t.TaskID}','${t.Options_Clues}')">Next Clue</button>
+                <input type="text" id="in-${t.TaskID}" placeholder="Answer">
+                <button class="submit-btn" onclick="submitClue('${t.TaskID}','${t.Site}','${t.Answer_Pts}')">Submit</button>`;
+            break;
+        case 'media':
+            div.innerHTML = `<p>${t.Question}</p>
+                <label><input type="checkbox" id="check-${t.TaskID}"> I uploaded to Drive</label>
+                <button class="submit-btn" onclick="submitMedia('${t.TaskID}','${t.Site}')">Confirm</button>`;
+            break;
+    }
+    return div;
 }
 
-async function fetchLeaderboard() {
-    const body = document.getElementById('leaderboard-body');
-    const spinner = document.getElementById('loading-spinner');
-    spinner.style.display = "block";
-    body.innerHTML = "";
-    try {
-        const res = await fetch(GOOGLE_SCRIPT_URL + "?action=getLeaderboard");
-        const data = await res.json();
-        spinner.style.display = "none";
-        data.rankings.forEach((r, i) => {
-            const icon = TEAM_CONFIG[r.team] ? TEAM_CONFIG[r.team].icon : "";
-            body.innerHTML += `<tr><td>${i+1}</td><td>${icon} ${r.team}</td><td>${r.points}</td></tr>`;
-        });
-    } catch (e) { spinner.innerText = "Check back once you have signal!"; }
+// Logic for Submissions
+async function postData(payload) {
+    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+    localStorage.setItem(`done_${payload.taskId}`, "true");
+    renderQuests();
 }
 
-// ADMIN PANEL
-function prepAdminLogin() {
-    const pass = prompt("Teacher Password:");
-    if (pass === "KARNATAKA2026") showSection('admin-panel');
-    else alert("Unauthorized.");
+function submitQuiz(id, site, val, correct) {
+    const pts = (val == correct) ? 10 : 0;
+    postData({ team: userTeam, site: site, taskId: id, type: 'quiz', content: val, autoPts: pts });
 }
 
-function resetLocalData() {
-    if(confirm("Clear local progress? (Does not delete Google Sheet data)")) {
-        localStorage.clear();
-        location.reload();
+function unlockSite(site) {
+    const code = document.getElementById(`code-${site}`).value;
+    const match = challenges.find(c => c.Site === site).SiteCode;
+    if (code === match) {
+        localStorage.setItem(`unlock_${site}`, "true");
+        renderQuests();
     }
 }
-
-function clearAppCache() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(regs => {
-            for(let r of regs) r.unregister();
-            location.reload(true);
-        });
-    }
-}
-
-function handleAdminTap() { /* Secret entry removed for dedicated button */ }
