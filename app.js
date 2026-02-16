@@ -36,6 +36,43 @@ function handleAdminTap(e) {
 
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwus5oJWiCpHM-lODpl2Ttleq2vNb7ZPEnxeBYMgQ2NB6lc15at8NysJrE3ZLCq01NN/exec";
 
+async function fetchLeaderboard() {
+    const tableBody = document.getElementById('leaderboard-body');
+    const spinner = document.getElementById('loading-spinner');
+    
+    spinner.style.display = "block";
+    tableBody.innerHTML = "";
+
+    try {
+        // We add a 'getLeaderboard' parameter to our URL
+        const response = await fetch(GOOGLE_SCRIPT_URL + "?action=getLeaderboard");
+        const data = await response.json();
+        
+        spinner.style.display = "none";
+        
+        data.rankings.forEach((row, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${getTeamIcon(row.team)} ${row.team}</td>
+                <td><strong>${row.points}</strong></td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    } catch (error) {
+        spinner.innerText = "Leaderboard currently offline. Check back later!";
+    }
+}
+
+function getTeamIcon(name) {
+    const icons = { "Indian Roller": "🐦", "Asian Elephant": "🐘", "Lotus": "🪷", "Sandalwood": "🪵", "Mango": "🥭" };
+    return icons[name] || "🚩";
+}
+
+function showSection(id) {
+    document.querySelectorAll('.page-section, #login-screen').forEach(s => s.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+}
 function submitToTeacher(payload) {
     fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
