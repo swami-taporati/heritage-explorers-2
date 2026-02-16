@@ -6,6 +6,13 @@ const TEAMS = {
     "Sandalwood": { pin: "7103" },
     "Mango": { pin: "6482" }
 };
+const TEAMS = {
+    "Indian Roller": { pin: "4921", folder: "https://drive.google.com/drive/folders/1Awv_3NvjvPhbnYXyZ-iELT3RA-SZdOBy?usp=drive_link" },
+    "Asian Elephant": { pin: "8374", folder: "https://drive.google.com/drive/folders/17FiZFV9g_5xfys1Parn8ZSD50aozR9l5?usp=drive_link" },
+    "Lotus": { pin: "2569", folder: "https://drive.google.com/drive/folders/1O4N5IMxpN25aXuK33A608KxFGcixT3WE?usp=drive_link" },
+    "Sandalwood": { pin: "7103", folder: "https://drive.google.com/drive/folders/1-qX4XPk6XCogJK9Wg13gfBeMFFtTMcdB?usp=drive_link" },
+    "Mango": { pin: "6482", folder: "https://drive.google.com/drive/folders/1a15Jo6htUwOtEhaYZrd_hSOQXm6Sp0bl?usp=drive_link" }
+};
 
 let userTeam = localStorage.getItem('team');
 let challenges = JSON.parse(localStorage.getItem('challenges') || "[]");
