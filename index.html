@@ -49,7 +49,10 @@
     <section id="admin-view" style="display:none">
         <div class="header-box">
             <h2>Teacher HQ</h2>
-            <button onclick="showView('selection-view')" class="back-btn" style="margin-bottom: 10px;">← Back</button>
+            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px;">
+            <button onclick="showView('selection-view')" class="back-btn">← Back</button>
+            <button onclick="logout()" class="back-btn" style="border-color: #e74c3c; color: #e74c3c;">🚪 Logout</button>
+        </div>
         </div>
         
         <div id="pending-list" class="admin-list">
