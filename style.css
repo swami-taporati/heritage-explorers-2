@@ -85,3 +85,32 @@ button {
     color: #C80E13;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
+
+/* Specific styling for the new team icons */
+.team-card[onclick*="Lotus"] {
+    border-bottom: 5px solid #ff80ab; /* Pink for Lotus */
+}
+
+.team-card[onclick*="Sandalwood"] {
+    border-bottom: 5px solid #8d6e63; /* Woody brown for Sandalwood */
+}
+
+/* Modal styling for better mobile focus */
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); /* Dim background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--hampi-sand);
+    padding: 30px;
+    border-radius: 20px;
+    border: 3px solid var(--kn-yellow);
+    width: 80%;
+}
