@@ -111,32 +111,74 @@ function renderQuests() {
 function createTaskUI(t) {
     const div = document.createElement('div');
     const isDone = localStorage.getItem(`done_${t.TaskID}`);
+    
+    // If task is completed, show a locked "Done" state
     div.className = `task-item ${isDone ? 'locked-task' : ''}`;
-    if (isDone) return (div.innerHTML = `<p>✅ Done: ${t.Question}</p>`, div);
+    if (isDone) {
+        div.innerHTML = `<p>✅ <strong>Completed:</strong> ${t.Question}</p>`;
+        return div;
+    }
 
+    // Base HTML for the question
     let html = `<p><strong>${t.Type.toUpperCase()}:</strong> ${t.Question}</p>`;
     
+    // 1. QUIZ TYPE (Multiple Choice)
     if (t.Type === 'quiz') {
-        t.Options_Clues.split(",").forEach((o, i) => {
+        const opts = t.Options_Clues.split(",");
+        html += `<div class="btn-group">`;
+        opts.forEach((o, i) => {
             html += `<button class="quiz-opt" onclick="submitQuiz('${t.TaskID}','${t.Site}',${i})">${o.trim()}</button>`;
         });
-    } else if (t.Type === 'clue') {
+        html += `</div>`;
+    } 
+
+    // 2. CLUE TYPE (Hints with Answer Box)
+    else if (t.Type === 'clue') {
         const clues = t.Options_Clues.split("|");
-        html += `<p id="clue-text-${t.TaskID}" class="clue-display">Clue 1: ${clues[0]}</p>
-                 <button class="clue-btn" onclick="nextClue('${t.TaskID}','${t.Options_Clues}')">Next Clue</button>
-                 <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Answer...">
-                 <button class="submit-btn" onclick="submitClue('${t.TaskID}','${t.Site}')">Submit</button>`;
-    } else if (t.Type === 'cowbull') {
-        html += `<div id="log-${t.TaskID}" class="puzzle-log">Attempts left: 10</div>
-                 <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Guess">
-                 <button class="submit-btn" onclick="submitCowBull('${t.TaskID}','${t.CorrectAns}','${t.Site}')">Check</button>`;
-    } else {
-        html += `<input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Your response...">
-                 <button class="submit-btn" onclick="submitManual('${t.TaskID}','${t.Site}','${t.Type}')">Send to Teacher</button>`;
+        html += `
+            <p id="clue-text-${t.TaskID}" class="clue-display">Clue 1: ${clues[0]}</p>
+            <button class="clue-btn" onclick="nextClue('${t.TaskID}','${t.Options_Clues}')">Need another clue? (-5 pts)</button>
+            <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Your Answer...">
+            <button class="submit-btn" onclick="submitClue('${t.TaskID}','${t.Site}')">Submit Answer</button>
+        `;
+    } 
+
+    // 3. COWBULL TYPE (Auto-Grade Puzzle)
+    else if (t.Type === 'cowbull') {
+        html += `
+            <div id="log-${t.TaskID}" class="puzzle-log">Target: ${t.CorrectAns.length} letters</div>
+            <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Guess word...">
+            <button class="submit-btn" onclick="submitCowBull('${t.TaskID}','${t.CorrectAns}','${t.Site}')">Check Guess</button>
+        `;
+    } 
+
+    // 4. MEDIA TYPE (Google Drive Upload)
+    else if (t.Type === 'media') {
+        const teamFolder = TEAMS[userTeam].folder;
+        html += `
+            <p class="admin-note">Capture a photo/video for this task!</p>
+            <button class="clue-btn" style="background: #34a853; color: white; border: none; margin-bottom:10px;" 
+                    onclick="window.open('${teamFolder}', '_blank')">
+                📁 Open ${userTeam} Upload Folder
+            </button>
+            <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Type 'DONE' after uploading...">
+            <button class="submit-btn" onclick="submitManual('${t.TaskID}','${t.Site}','media')">Confirm Submission</button>
+        `;
     }
+
+    // 5. WORD TYPE (Manual Teacher Approval)
+    else {
+        html += `
+            <p class="admin-note">Teacher approval required</p>
+            <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Type your answer here...">
+            <button class="submit-btn" onclick="submitManual('${t.TaskID}','${t.Site}','word')">Send to Teacher</button>
+        `;
+    }
+
     div.innerHTML = html;
     return div;
 }
+
 async function renderLeaderboard() {
     const res = await fetch(`${SCRIPT_URL}?action=getLeaderboard`);
     const leaderboard = await res.json();
