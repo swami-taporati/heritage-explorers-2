@@ -222,20 +222,47 @@ function submitClue(id, site) {
 
 function submitCowBull(id, target, site) {
     let attempts = parseInt(localStorage.getItem(`attempts_${id}`) || 0);
-    if (attempts >= 10) return;
+    if (attempts >= 10) return alert("No attempts left!");
+
     const guess = document.getElementById(`in-${id}`).value.toUpperCase().trim();
-    if (guess.length !== target.length) return alert("Wrong length");
+    if (guess.length !== target.length) return alert(`Word must be ${target.length} letters!`);
+
     attempts++;
     localStorage.setItem(`attempts_${id}`, attempts);
-    
-    let b=0, c=0, tArr=target.toUpperCase().split(""), gArr=guess.split("");
-    for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]){ b++; tArr[i]=null; gArr[i]=null; }
-    for(let i=0; i<gArr.length; i++) if(gArr[i] && tArr.includes(gArr[i])){ c++; tArr[tArr.indexOf(gArr[i])]=null; }
 
-    document.getElementById(`log-${id}`).innerHTML += `<div>${attempts}: ${guess} (${b}B ${c}C)</div>`;
-    if (b === target.length) {
+    let bulls = 0;
+    let cows = 0;
+    let targetArr = target.toUpperCase().split("");
+    let guessArr = guess.split("");
+
+    // First pass: Find Bulls (Correct position)
+    for (let i = 0; i < targetArr.length; i++) {
+        if (guessArr[i] === targetArr[i]) {
+            bulls++;
+            targetArr[i] = null; // Mark used
+            guessArr[i] = null;  // Mark used
+        }
+    }
+
+    // Second pass: Find Cows (Wrong position)
+    for (let i = 0; i < guessArr.length; i++) {
+        if (guessArr[i] !== null) {
+            let index = targetArr.indexOf(guessArr[i]);
+            if (index !== -1) {
+                cows++;
+                targetArr[index] = null;
+            }
+        }
+    }
+
+    const log = document.getElementById(`log-${id}`);
+    log.innerHTML += `<div>${attempts}: ${guess} (${bulls}B, ${cows}C)</div>`;
+
+    if (bulls === target.length) {
+        alert("🎉 Correct! Sending score...");
         sendSubmission({ team: userTeam, site: site, taskId: id, type: 'cowbull', content: guess, autoPts: 20 });
     } else if (attempts >= 10) {
+        alert("Out of attempts! 0 points.");
         sendSubmission({ team: userTeam, site: site, taskId: id, type: 'cowbull', content: "FAILED", autoPts: 0 });
     }
 }
@@ -282,6 +309,26 @@ async function renderPending() {
         <div class="quest-card">${i.team}: ${i.content} 
         <input type="number" id="p-${i.row}" placeholder="Pts">
         <button onclick="approveTask(${i.row})">OK</button></div>`).join("");
+}
+
+async function updateLeaderboard() {
+    const container = document.getElementById('leaderboard-container');
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=getLeaderboard`);
+        const data = await res.json();
+        
+        // Sort data by score descending
+        data.sort((a, b) => b.score - a.score);
+
+        container.innerHTML = data.map((item, index) => `
+            <div class="score-row">
+                <span>${index + 1}. ${item.team}</span>
+                <span><strong>${item.score}</strong></span>
+            </div>
+        `).join("");
+    } catch (e) {
+        container.innerHTML = "<p>Leaderboard currently unavailable.</p>";
+    }
 }
 
 async function approveTask(row) {
