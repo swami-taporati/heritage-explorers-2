@@ -148,20 +148,58 @@ function unlockSite(site) {
     } else { alert("Incorrect site code!"); }
 }
 
-function submitQuiz(id, site, val, correct) {
-    const pts = (val == correct) ? 10 : 0;
-    sendToSheet({ team: userTeam, site: site, taskId: id, type: 'quiz', content: `Choice: ${val}`, autoPts: pts });
-}
+// --- QUIZ SUBMISSION ---
+function submitQuiz(id, site, userChoice) {
+    const t = challenges.find(task => task.TaskID === id);
+    
+    // Check if userChoice (0,1,2) matches CorrectAns (2)
+    const isCorrect = (userChoice == t.CorrectAns);
+    const finalPts = isCorrect ? parseInt(t.Points) : 0;
 
+    if(isCorrect) alert(`🎯 Correct! +${finalPts} Points`);
+    else alert("❌ Incorrect answer.");
+
+    sendToSheet({ 
+        team: userTeam, site: site, taskId: id, type: 'quiz', 
+        content: `Choice: ${userChoice}`, autoPts: finalPts 
+    });
+}
+// --- CLUE SUBMISSION ---
+function submitClue(id, site) {
+    const t = challenges.find(task => task.TaskID === id);
+    const userAns = document.getElementById(`in-${id}`).value.toUpperCase().trim();
+    const correctAns = t.CorrectAns.toString().toUpperCase().trim();
+    
+    if (userAns === correctAns) {
+        // Penalty logic: -5 points for every extra clue used
+        const cluesUsed = parseInt(localStorage.getItem(`clue_used_${id}`) || 1);
+        let finalPts = parseInt(t.Points) - ((cluesUsed - 1) * 5); 
+        if (finalPts < 5) finalPts = 5; // Floor of 5 points
+
+        alert(`🎉 Correct! You earned ${finalPts} points.`);
+        sendToSheet({ team: userTeam, site: site, taskId: id, type: 'clue', content: userAns, autoPts: finalPts });
+    } else {
+        alert("🔍 Not quite right. Look closer!");
+    }
+}
 function submitWordGuess(id, target, site) {
+    const t = challenges.find(task => task.TaskID === id);
     const guess = document.getElementById(`word-in-${id}`).value.toUpperCase();
-    if (guess.length !== target.length) return alert("Wrong length!");
+    
+    if (guess.length !== target.length) return alert(`Must be ${target.length} letters!`);
+    
+    // Cow & Bull Math logic here...
     let b = 0, c = 0;
     let tArr = target.split(""), gArr = guess.split("");
     for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]) { b++; tArr[i]=null; gArr[i]=null; }
     for(let i=0; i<gArr.length; i++) if(gArr[i] && tArr.includes(gArr[i])) { c++; tArr[tArr.indexOf(gArr[i])]=null; }
+    
     document.getElementById(`log-${id}`).innerHTML += `<div>${guess}: ${b}B ${c}C</div>`;
-    if (b === target.length) sendToSheet({ team: userTeam, site: site, taskId: id, type: 'word', content: guess, autoPts: 20 });
+    
+    if (b === target.length) {
+        alert("🎊 WORD UNLOCKED!");
+        sendToSheet({ team: userTeam, site: site, taskId: id, type: 'word', content: guess, autoPts: t.Points });
+    }
 }
 
 // --- TEACHER ADMIN LOGIC ---
