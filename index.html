@@ -3,75 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heritage Explorers II</title>
+    <title>Heritage Engine V3</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#C80E13">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header onclick="handleAdminTap()">
-        <h1>HERITAGE EXPLORERS II</h1>
-        <p>Karnataka Expedition 2026</p>
+    <header>
+        <h1 id="site-title">HERITAGE ENGINE</h1>
+        <div id="score-display" style="display:none;">Pts: <span id="my-pts">0</span></div>
     </header>
 
-    <nav id="main-nav" style="display:none;">
-        <button onclick="showSection('dashboard')">🏰 Quests</button>
-        <button onclick="showSection('leaderboard-section'); fetchLeaderboard();">🏆 Rankings</button>
-    </nav>
-
-    <main id="app">
-        <section id="login-screen" class="active-section">
-            <h2 class="section-title">Select Your Team</h2>
-            <div class="team-grid">
-                <div class="team-card" onclick="prepLogin('Indian Roller')"><img src="images/roller.png"><br>Roller</div>
-                <div class="team-card" onclick="prepLogin('Asian Elephant')"><img src="images/elephant.png"><br>Gaja</div>
-                <div class="team-card" onclick="prepLogin('Lotus')"><img src="images/lotus.png"><br>Kamal</div>
-                <div class="team-card" onclick="prepLogin('Sandalwood')"><img src="images/sandalwood.png"><br>Shrigandha</div>
-                <div class="team-card" onclick="prepLogin('Mango')"><img src="images/mango.png"><br>Amra</div>
-                <div class="team-card admin-card" onclick="prepAdminLogin()">🔑<br>Teacher</div>
-            </div>
-            
-            <div id="pin-modal" class="modal" style="display:none;">
-                <div class="modal-content">
-                    <h3 id="modal-team-name"></h3>
-                    <input type="tel" id="team-pin" placeholder="4-Digit PIN" maxlength="4">
-                    <div class="modal-btns">
-                        <button class="primary-btn" onclick="login()">Enter</button>
-                        <button class="secondary-btn" onclick="hidePinEntry()">Back</button>
-                    </div>
-                </div>
-            </div>
+    <div id="app">
+        <section id="login-view">
+            <div class="team-grid" id="team-selector"></div>
+            <button class="admin-access" onclick="openAdmin()">Teacher Login</button>
         </section>
 
-        <section id="dashboard" class="page-section" style="display:none;">
-            <div class="score-ribbon">
-                <div id="user-team-display"></div>
-                <div class="points-badge">Team Points: <span id="team-live-score">0</span></div>
-            </div>
+        <section id="main-view" style="display:none;">
             <div id="quest-container"></div>
-            <button class="small-btn logout-btn" onclick="logout()">Logout</button>
+            <button class="sync-btn" onclick="syncData()">🔄 Sync Challenges</button>
         </section>
 
-        <section id="leaderboard-section" class="page-section" style="display:none;">
-            <h2 class="section-title">Live Standings</h2>
-            <div id="loading-spinner">Syncing with HQ...</div>
-            <table id="leaderboard-table">
-                <thead><tr><th>#</th><th>Team</th><th>Pts</th></tr></thead>
-                <tbody id="leaderboard-body"></tbody>
-            </table>
+        <section id="admin-view" style="display:none;">
+            <h2>Grading Panel</h2>
+            <div id="pending-list"></div>
+            <button onclick="location.reload()">Exit Admin</button>
         </section>
+    </div>
 
-        <section id="admin-panel" class="page-section" style="display:none;">
-            <h2 class="section-title">Teacher HQ</h2>
-            <div class="admin-grid">
-                <button class="danger-btn" onclick="resetLocalData()">🔄 Reset This Device</button>
-                <button class="primary-btn" onclick="clearAppCache()">🧹 Force App Refresh</button>
-                <p class="admin-note">To add tasks or edit scores, please use the Google Sheet directly.</p>
-            </div>
-            <button class="primary-btn" onclick="location.reload()">Back to Home</button>
-        </section>
-    </main>
+    <div id="pin-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3 id="target-team"></h3>
+            <input type="password" id="pin-input" maxlength="4" placeholder="Enter PIN">
+            <button onclick="checkLogin()">Enter</button>
+            <button onclick="closeModal()">Back</button>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
