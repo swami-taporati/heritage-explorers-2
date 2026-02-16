@@ -6,6 +6,7 @@ h1 { font-family: 'Cinzel', serif; font-size: 1rem; margin: 0; }
 .section-title { margin-top: 20px; font-family: 'Cinzel', serif; }
 .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
 .team-btn { background: white; border: 2px solid var(--dark); padding: 20px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+.team-icon { width: 50px; height: 50px; margin-bottom: 10px; }
 
 .quest-card { background: white; margin: 15px; padding: 15px; border-radius: 12px; border-left: 6px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 .task-item { background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #ddd; }
@@ -19,6 +20,7 @@ h1 { font-family: 'Cinzel', serif; font-size: 1rem; margin: 0; }
 .puzzle-log { background: #222; color: #0f0; font-family: monospace; padding: 10px; border-radius: 5px; margin: 10px 0; max-height: 80px; overflow-y: auto; font-size: 0.8rem; }
 .sync-btn { position: fixed; bottom: 20px; right: 20px; background: var(--dark); color: white; border: none; padding: 15px 20px; border-radius: 50px; font-weight: bold; z-index: 100; }
 .clue-display {    background: #fff9c4;    padding: 10px;    border-radius: 6px;    border-left: 4px solid #fbc02d;    font-size: 0.9rem;}
+
 
 .puzzle-log {     background: #1a1a1a;    color: #43a047;    font-family: 'Courier New', Courier, monospace;    padding: 10px;    border-radius: 6px;    margin: 10px 0;    font-size: 0.8rem;   max-height: 120px;    overflow-y: auto;}
 
