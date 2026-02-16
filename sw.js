@@ -5,6 +5,11 @@ const ASSETS = [
   './style.css',
   './app.js',
   './manifest.json',
+  './images/roller.png',
+  './images/elephant.png',
+  './images/lotus.png',
+  './images/sandalwood.png',
+  './images/mango.png'',
   'https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@400;600&display=swap'
 ];
 
