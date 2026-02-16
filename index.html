@@ -7,37 +7,48 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1 id="main-title">Heritage Explorers II</h1>
-        <div id="admin-panel" style="display:none;">
-            <button onclick="resetGame()">⚠️ RESET ALL DATA</button>
-        </div>
+    <header onclick="handleAdminTap(event)">
+        <h1 id="app-title">HERITAGE EXPLORERS II</h1>
     </header>
 
-    <div id="game-container">
-        <section id="setup">
-            <h3>Select Your Team</h3>
-            <button onclick="selectTeam('Indian Roller', '🐦')">🐦 Team Roller</button>
-            <button onclick="selectTeam('Asian Elephant', '🐘')">🐘 Team Gaja</button>
-            <button onclick="selectTeam('Lotus', '🪷')">🪷 Team Kamal</button>
-            <button onclick="selectTeam('Sandalwood', '🪵')">🪵 Team Shrigandha</button>
-            <button onclick="selectTeam('Mango', '🥭')">🥭 Team Amra</button>
-        </section>
-
-        <section id="play-area" style="display:none;">
-            <h2 id="team-display"></h2>
-            <div id="location-lock">
-                <input type="text" id="unlockCode" placeholder="Enter Location Code">
-                <button onclick="unlockLocation()">Unlock Next Stop</button>
+    <main id="app">
+        <section id="login-screen">
+            <h2>Select Team</h2>
+            <div class="team-grid">
+                <div class="team-card" onclick="showPinEntry('Indian Roller', '🐦')">🐦 Roller</div>
+                <div class="team-card" onclick="showPinEntry('Asian Elephant', '🐘')">🐘 Gaja</div>
+                <div class="team-card" onclick="showPinEntry('Lotus', '🪷')">🪷 Kamal</div>
+                <div class="team-card" onclick="showPinEntry('Sandalwood', '🪵')">🪵 Shrigandha</div>
+                <div class="team-card" onclick="showPinEntry('Mango', '🥭')">🥭 Amra</div>
             </div>
-            <div id="challenge-box" style="display:none;">
-                <p id="task-desc"></p>
-                <input type="file" accept="image/*,video/*" id="submission">
-                <button onclick="submitTask()">Upload Submission</button>
+            
+            <div id="pin-modal" style="display:none;">
+                <input type="password" id="team-pin" placeholder="Enter Team PIN">
+                <button onclick="login()">Enter</button>
+                <button class="back-btn" onclick="hidePinEntry()">Back</button>
             </div>
         </section>
-    </div>
 
-    <script src="game.js"></script>
+        <section id="dashboard" style="display:none;">
+            <div class="team-header">
+                <span id="user-team-icon"></span> <span id="user-team-name"></span>
+                <button class="back-btn" onclick="logout()">Logout</button>
+            </div>
+            
+            <div id="quest-list">
+                </div>
+        </section>
+
+        <section id="admin-panel" style="display:none;">
+            <h2>Teacher Dashboard</h2>
+            <button onclick="resetAllTeams()">Reset Game for All</button>
+            <button onclick="addCustomChallenge()">+ Add Dynamic Challenge</button>
+            <div id="submission-queue">
+                </div>
+            <button class="back-btn" onclick="closeAdmin()">Close Admin</button>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
 </body>
 </html>
