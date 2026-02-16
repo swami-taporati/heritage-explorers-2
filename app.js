@@ -16,7 +16,10 @@ window.onload = () => {
     initTeams();
     if (userTeam) {
         showView('main-view');
+        // ADD THIS LINE:
+        document.getElementById('active-team-banner').innerText = `Team: ${userTeam}`;
         renderQuests();
+        updateScoreDisplay(); // Added to fix point 3
     }
 };
 
@@ -33,7 +36,11 @@ function initTeams() {
     Object.keys(TEAMS).forEach(t => {
         const btn = document.createElement('div');
         btn.className = "team-btn";
-        btn.innerText = t;
+        // ADD THIS INNER HTML:
+        btn.innerHTML = `
+            <img src="icons/${t}.png" class="team-icon" onerror="this.src='icons/default.png'">
+            <div>${t}</div>
+        `;
         btn.onclick = () => openPin(t);
         grid.appendChild(btn);
     });
@@ -177,7 +184,9 @@ function nextClue(id, cluesStr) {
 function submitClue(id, site) {
     const t = challenges.find(task => task.TaskID === id);
     const userAns = document.getElementById(`in-${id}`).value.toUpperCase().trim();
+    // Use t.CorrectAns directly:
     const correctAns = t.CorrectAns.toString().toUpperCase().trim();
+    
     if (userAns === correctAns) {
         const count = parseInt(localStorage.getItem(`clue_count_${id}`) || 1);
         let pts = parseInt(t.Points) - ((count - 1) * 5);
@@ -246,6 +255,20 @@ async function gradeTask(rowId) {
     await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'grade', row: rowId, pts: pts }) });
     alert("Points Assigned.");
     loadPendingReviews();
+}
+
+sync function updateScoreDisplay() {
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=getScore&team=${userTeam}`);
+        const total = await res.text();
+        document.getElementById('my-pts').innerText = total;
+    } catch (e) { console.log("Score sync failed"); }
+}
+
+// Update your sendSubmission function to call this after a success:
+async function sendSubmission(payload) {
+    // ... (existing code)
+    await updateScoreDisplay(); // Refresh points after answering
 }
 
 function resetGameForUser() {
