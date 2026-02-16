@@ -1,16 +1,34 @@
-const CACHE_NAME = 'heritage-v3-cache';
+const CACHE_NAME = 'heritage-v4-cache'; // Incremented version
 const urlsToCache = [
   './',
   './index.html',
   './style.css',
   './app.js',
-  'https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@400;600&display=swap'
+  // Updated to match the Cinzel and Fauna One fonts used in your HTML
+  'https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Fauna+One&display=swap'
 ];
 
 // Install Service Worker
 self.addEventListener('install', event => {
+  self.skipWaiting(); // Forces the new service worker to take over immediately
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+  );
+});
+
+// Activate - Clean up old caches
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cache => {
+          if (cache !== CACHE_NAME) {
+            console.log('Service Worker: Clearing Old Cache');
+            return caches.delete(cache);
+          }
+        })
+      );
+    })
   );
 });
 
