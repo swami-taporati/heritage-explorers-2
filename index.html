@@ -3,48 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heritage Engine V3</title>
+    <title>Heritage Engine 2026</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Fauna+One&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1 id="site-title">HERITAGE EXPLORERS</h1>
-        <div id="score-display" style="display:none;">Pts: <span id="my-pts">0</span></div>
-    </header>
 
-    <main id="app">
-        <section id="login-view">
-            <h2 class="section-title">Select Team</h2>
-            <div class="team-grid" id="team-selector"></div>
-            <button class="admin-access-btn" onclick="openAdmin()">🔑 Teacher HQ</button>
-        </section>
+    <section id="selection-view">
+        <div class="header-box">
+            <h1>Heritage Engine</h1>
+            <p>Select your team to begin</p>
+        </div>
+        <div id="team-selector" class="team-grid"></div>
+        <hr>
+        <button class="admin-btn" onclick="openAdmin()">🔑 Teacher HQ</button>
+    </section>
 
-        <section id="main-view" style="display:none;">
-            <div class="team-banner" id="active-team-banner"></div>
-            <div id="quest-container"></div>
+    <section id="main-view" style="display:none">
+        <div class="team-banner">
+            <span id="active-team-banner">Loading Team...</span>
+            <div id="score-display">Pts: <span id="my-pts">0</span></div>
+        </div>
+        
+        <div class="controls">
             <button class="sync-btn" onclick="syncData()">🔄 Sync Challenges</button>
-            <button class="logout-link" onclick="logout()">Logout Team</button>
-        </section>
+        </div>
 
-        <section id="admin-view" style="display:none;">
-            <h2 class="section-title">Teacher Review HQ</h2>
-            <div class="admin-tools">
-                <button class="danger-btn" onclick="resetGameForUser()">⚠️ Reset This Device</button>
-                <button class="primary-btn" onclick="loadPendingReviews()">Refresh Submissions</button>
-            </div>
-            <div id="pending-list"></div>
-            <button class="secondary-btn" onclick="location.reload()">Back to Home</button>
-        </section>
-    </main>
+        <div id="quest-container"></div>
 
-    <div id="pin-modal" class="modal" style="display:none;">
+        <button class="logout-btn" onclick="logout()">Change Team / Logout</button>
+    </section>
+
+    <section id="admin-view" style="display:none">
+        <div class="header-box">
+            <h2>Teacher HQ</h2>
+            <button onclick="showView('selection-view')" class="back-btn">← Back</button>
+        </div>
+        <div id="pending-list"></div>
+        <hr>
+        <button class="danger-btn" onclick="resetGameForUser()">⚠️ Reset This Device</button>
+    </section>
+
+    <div id="pin-modal" class="modal" style="display:none">
         <div class="modal-content">
-            <h3 id="target-team"></h3>
-            <input type="tel" id="pin-input" maxlength="4" placeholder="4-Digit PIN">
+            <h3 id="target-team">Team Name</h3>
+            <input type="password" id="pin-input" pattern="\[0-9]*" inputmode="numeric" placeholder="Enter PIN">
             <div class="modal-btns">
-                <button class="primary-btn" onclick="checkLogin()">Enter</button>
-                <button class="secondary-btn" onclick="closeModal()">Cancel</button>
+                <button onclick="checkLogin()" class="primary-btn">Login</button>
+                <button onclick="closeModal()" class="back-btn">Cancel</button>
             </div>
         </div>
     </div>
