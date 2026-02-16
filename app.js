@@ -64,10 +64,11 @@ function loadDashboard() {
     const container = document.getElementById('quest-container');
     const completed = JSON.parse(localStorage.getItem('completedLevels') || "[]");
     
-    // Add the Drive Button at the top
+    document.getElementById('user-team-display').innerHTML = `${TEAM_CONFIG[currentTeam].icon} <span>${currentTeam}</span>`;
+    
     container.innerHTML = `
         <div class="drive-box">
-            <p>📁 Upload photos to your Team Drive first:</p>
+            <p>📁 Step 1: Upload media to your folder</p>
             <a href="${DRIVE_LINKS[currentTeam]}" target="_blank" class="drive-btn">Open Team Drive</a>
         </div>
     `;
@@ -83,12 +84,14 @@ function loadDashboard() {
                 <button class="primary-btn" onclick="unlock(${q.id})">Unlock Site</button>
             </div>
             <div id="task-${q.id}" style="display:none;" class="task-area">
-                <p><strong>📸 Task:</strong> ${q.task}</p>
-                <input type="text" id="media-${q.id}" placeholder="Photo Link or 'Shown to Teacher'" class="media-input">
+                <p><strong>📸 Step 2: Task</strong><br>${q.task}</p>
+                <label class="upload-confirm">
+                    <input type="checkbox" id="media-check-${q.id}"> I have uploaded the photo/video to Drive
+                </label>
                 <hr>
-                <p><strong>🧠 Quiz:</strong> ${q.quiz.q}</p>
+                <p><strong>🧠 Step 3: Quiz</strong><br>${q.quiz.q}</p>
                 ${q.quiz.o.map((opt, i) => `<label class="quiz-opt"><input type="radio" name="q-${q.id}" value="${i}"> ${opt}</label>`).join('')}
-                <button class="submit-btn" onclick="submit(${q.id})">Submit & Sync Points</button>
+                <button class="submit-btn" onclick="submit(${q.id})">Finalize & Sync</button>
             </div>`;
         container.appendChild(card);
     });
@@ -103,37 +106,35 @@ function unlock(id) {
 }
 
 async function submit(id) {
-    const quest = QUEST_DATA.find(q => q.id === id);
-    const selected = document.querySelector(`input[name="q-${id}"]:checked`);
-    const media = document.getElementById(`media-${id}`).value;
+    const q = QUEST_DATA.find(x => x.id === id);
+    const sel = document.querySelector(`input[name="q-${id}"]:checked`);
+    const isUploaded = document.getElementById(`media-check-${id}`).checked;
 
-    if (!selected) return alert("Please answer the quiz!");
-    if (!media) return alert("Please type something in the photo link box!");
+    if (!sel) return alert("Please answer the quiz!");
+    if (!isUploaded) return alert("Please check the box to confirm you uploaded the media!");
 
-    let points = (parseInt(selected.value) === quest.quiz.a) ? quest.auto : 0;
+    let pts = (parseInt(sel.value) === q.quiz.a) ? q.auto : 0;
     
-    const completed = JSON.parse(localStorage.getItem('completedLevels') || "[]");
-    completed.push(id);
-    localStorage.setItem('completedLevels', JSON.stringify(completed));
+    const comp = JSON.parse(localStorage.getItem('completedLevels') || "[]");
+    comp.push(id);
+    localStorage.setItem('completedLevels', JSON.stringify(comp));
     
     const payload = { 
         team: currentTeam, 
-        location: quest.loc, 
+        location: q.loc, 
         taskType: "Quest", 
-        content: `Quiz: ${quest.quiz.o[selected.value]} | Media: ${media}`, 
-        autoPoints: points 
+        content: `Media Uploaded: YES | Ans: ${q.quiz.o[sel.value]}`, 
+        autoPoints: pts 
     };
 
-    alert(points > 0 ? "Correct! +10 Points." : "Task saved!");
-    
-    // Sync to Sheet
+    alert(pts > 0 ? "Correct Quiz! +10 Pts." : "Task Submitted.");
+
     fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
     .then(() => {
         loadDashboard();
         updateMyTeamScore();
     });
 }
-
 // DATA SYNC
 async function updateMyTeamScore() {
     try {
