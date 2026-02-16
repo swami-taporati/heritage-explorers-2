@@ -107,6 +107,15 @@ input[type="text"], input[type="password"], input[type="number"] {
     overflow-y: auto; 
     font-size: 0.85em;
 }
+.quiz-opt:active {
+    background-color: #ddd;
+    transform: translateY(2px);
+}
+
+.quiz-opt:focus {
+    outline: none;
+    border: 2px solid var(--accent) !important;
+}
 
 /* Leaderboard */
 .score-row {
