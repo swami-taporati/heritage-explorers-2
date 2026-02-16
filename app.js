@@ -1,5 +1,4 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyH0ey1aVqAx2byXwg8IByOnOJUu-nJOBFGH6YXoQqNRRoAAdVswp7Rs0SbPIg7tzq9Sg/exec";
-
 const TEAMS = {
     "Indian Roller": { pin: "4921" },
     "Asian Elephant": { pin: "8374" },
@@ -11,16 +10,17 @@ const TEAMS = {
 let userTeam = localStorage.getItem('team');
 let challenges = JSON.parse(localStorage.getItem('challenges') || "[]");
 let selectedTeamTemp = "";
+let currentCluesUsed = {}; 
 
 window.onload = () => {
     initTeams();
     if (userTeam) {
         showView('main-view');
         renderQuests();
-        updateScoreDisplay();
     }
 };
 
+// --- NAVIGATION & UI ---
 function showView(id) {
     document.querySelectorAll('section').forEach(s => s.style.display = 'none');
     document.getElementById(id).style.display = 'block';
@@ -29,6 +29,7 @@ function showView(id) {
 
 function initTeams() {
     const grid = document.getElementById('team-selector');
+    grid.innerHTML = "";
     Object.keys(TEAMS).forEach(t => {
         const btn = document.createElement('div');
         btn.className = "team-btn";
@@ -38,7 +39,6 @@ function initTeams() {
     });
 }
 
-// --- LOGIN LOGIC ---
 function openPin(team) {
     selectedTeamTemp = team;
     document.getElementById('target-team').innerText = team;
@@ -58,18 +58,17 @@ function checkLogin() {
 
 function logout() { localStorage.removeItem('team'); location.reload(); }
 
-// --- DATA SYNC ---
+// --- DATA ENGINE ---
 async function syncData() {
     try {
         const res = await fetch(`${SCRIPT_URL}?action=sync`);
         challenges = await res.json();
         localStorage.setItem('challenges', JSON.stringify(challenges));
         renderQuests();
-        alert("Trip Data Synchronized!");
-    } catch (e) { alert("Offline. Connect to internet to sync."); }
+        alert("✅ Trip Data Updated!");
+    } catch (e) { alert("📡 Connection error. Try again when you have signal."); }
 }
 
-// --- RENDER DASHBOARD ---
 function renderQuests() {
     const cont = document.getElementById('quest-container');
     cont.innerHTML = "";
@@ -82,9 +81,8 @@ function renderQuests() {
         
         if (!isUnlocked) {
             card.innerHTML = `<h3>${site}</h3>
-                <p style="font-size:0.8rem">Site Locked. Enter the code provided by your teacher.</p>
-                <input type="text" id="code-${site}" class="quiz-opt" placeholder="Unlock Code">
-                <button class="submit-btn" onclick="unlockSite('${site}')">Unlock Site</button>`;
+                <input type="text" id="code-${site}" class="quiz-opt" placeholder="Enter Unlock Code">
+                <button class="submit-btn" onclick="unlockSite('${site}')">Unlock Location</button>`;
         } else {
             card.innerHTML = `<h3>${site}</h3>`;
             challenges.filter(c => c.Site === site).forEach(t => {
@@ -101,110 +99,119 @@ function createTaskUI(t) {
     div.className = `task-item ${isDone ? 'locked-task' : ''}`;
     
     if (isDone) {
-        div.innerHTML = `<p>✅ <strong>Completed:</strong> ${t.Question}</p>`;
+        div.innerHTML = `<p>✅ <strong>Task Locked:</strong> ${t.Question}</p>`;
         return div;
     }
 
     let html = `<p><strong>Task:</strong> ${t.Question}</p>`;
+    
     if (t.Type === 'quiz') {
         const opts = t.Options_Clues.split(",");
-        html += opts.map((o,i) => `<button class="quiz-opt" onclick="submitQuiz('${t.TaskID}','${t.Site}',${i},${t.Answer_Pts})">${o}</button>`).join("");
-    } else if (t.Type === 'clue') {
+        html += opts.map((o,i) => `<button class="quiz-opt" onclick="submitQuiz('${t.TaskID}','${t.Site}',${i})">${o}</button>`).join("");
+    } 
+    else if (t.Type === 'clue') {
         const clues = t.Options_Clues.split("|");
-        html += `<p id="clue-text-${t.TaskID}" style="font-style:italic; color:#555;">Clue 1: ${clues[0]}</p>
-                 <button class="clue-btn" onclick="nextClue('${t.TaskID}','${t.Options_Clues}')">Next Clue</button>
+        html += `<p id="clue-text-${t.TaskID}" class="clue-display">Clue 1: ${clues[0]}</p>
+                 <button class="clue-btn" onclick="nextClue('${t.TaskID}','${t.Options_Clues}')">Need another clue?</button>
                  <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Answer">
-                 <button class="submit-btn" onclick="submitClue('${t.TaskID}','${t.Site}','${t.Answer_Pts}')">Submit Solve</button>`;
-    } else if (t.Type === 'media') {
-        html += `<label><input type="checkbox" id="check-${t.TaskID}"> Uploaded to Drive Folder</label>
+                 <button class="submit-btn" onclick="submitClue('${t.TaskID}','${t.Site}')">Submit Solve</button>`;
+    } 
+    else if (t.Type === 'media') {
+        html += `<label class="upload-label"><input type="checkbox" id="check-${t.TaskID}"> I have uploaded to Drive</label>
                  <button class="submit-btn" onclick="submitMedia('${t.TaskID}','${t.Site}')">Confirm Submission</button>`;
-    } else if (t.Type === 'word') {
-        html += `<div id="log-${t.TaskID}" class="puzzle-log">Target: ${t.Answer_Pts.length} letters</div>
+    } 
+    else if (t.Type === 'word') {
+        html += `<div id="log-${t.TaskID}" class="puzzle-log">Goal: ${t.CorrectAns.length} letters</div>
                  <input type="text" id="word-in-${t.TaskID}" class="quiz-opt" placeholder="Guess word">
-                 <button class="submit-btn" onclick="submitWordGuess('${t.TaskID}','${t.Answer_Pts}','${t.Site}')">Check Cow/Bull</button>`;
-    } else if (t.Type === 'short') {
-        html += `<textarea id="text-${t.TaskID}" class="quiz-opt" placeholder="Your answer..."></textarea>
+                 <button class="submit-btn" onclick="submitWordGuess('${t.TaskID}','${t.CorrectAns}','${t.Site}')">Check Cow/Bull</button>`;
+    }
+    else if (t.Type === 'short') {
+        html += `<textarea id="text-${t.TaskID}" class="quiz-opt" placeholder="Type your answer here..."></textarea>
                  <button class="submit-btn" onclick="submitShort('${t.TaskID}','${t.Site}')">Submit Answer</button>`;
     }
+
     div.innerHTML = html;
     return div;
 }
 
-// --- SUBMISSION LOGIC ---
-async function sendToSheet(payload) {
+// --- LOGIC FUNCTIONS ---
+function unlockSite(site) {
+    const val = document.getElementById(`code-${site}`).value.toUpperCase();
+    const correct = challenges.find(c => c.Site === site).SiteCode.toString().toUpperCase();
+    if (val === correct) {
+        localStorage.setItem(`unlock_${site}`, "true");
+        renderQuests();
+    } else { alert("❌ Incorrect Site Code!"); }
+}
+
+async function sendSubmission(payload) {
     try {
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
         localStorage.setItem(`done_${payload.taskId}`, "true");
         renderQuests();
-    } catch (e) { alert("Save failed. Try again."); }
+    } catch (e) { alert("Failed to save. Try again."); }
 }
 
-function unlockSite(site) {
-    const val = document.getElementById(`code-${site}`).value.toUpperCase();
-    const correct = challenges.find(c => c.Site === site).SiteCode.toUpperCase();
-    if (val === correct) {
-        localStorage.setItem(`unlock_${site}`, "true");
-        renderQuests();
-    } else { alert("Incorrect site code!"); }
-}
-
-// --- QUIZ SUBMISSION ---
-function submitQuiz(id, site, userChoice) {
+function submitQuiz(id, site, userIndex) {
     const t = challenges.find(task => task.TaskID === id);
-    
-    // Check if userChoice (0,1,2) matches CorrectAns (2)
-    const isCorrect = (userChoice == t.CorrectAns);
+    const isCorrect = (userIndex == t.CorrectAns);
     const finalPts = isCorrect ? parseInt(t.Points) : 0;
-
-    if(isCorrect) alert(`🎯 Correct! +${finalPts} Points`);
-    else alert("❌ Incorrect answer.");
-
-    sendToSheet({ 
-        team: userTeam, site: site, taskId: id, type: 'quiz', 
-        content: `Choice: ${userChoice}`, autoPts: finalPts 
-    });
+    if(isCorrect) alert("🎯 Correct!"); else alert("❌ Incorrect.");
+    sendSubmission({ team: userTeam, site: site, taskId: id, type: 'quiz', content: `Index: ${userIndex}`, autoPts: finalPts });
 }
-// --- CLUE SUBMISSION ---
+
+function nextClue(id, cluesStr) {
+    const clues = cluesStr.split("|");
+    currentCluesUsed[id] = (currentCluesUsed[id] || 1);
+    if (currentCluesUsed[id] < clues.length) {
+        currentCluesUsed[id]++;
+        document.getElementById(`clue-text-${id}`).innerText = "Clue " + currentCluesUsed[id] + ": " + clues[currentCluesUsed[id]-1];
+        localStorage.setItem(`clue_count_${id}`, currentCluesUsed[id]);
+    } else { alert("No more clues left!"); }
+}
+
 function submitClue(id, site) {
     const t = challenges.find(task => task.TaskID === id);
     const userAns = document.getElementById(`in-${id}`).value.toUpperCase().trim();
     const correctAns = t.CorrectAns.toString().toUpperCase().trim();
-    
     if (userAns === correctAns) {
-        // Penalty logic: -5 points for every extra clue used
-        const cluesUsed = parseInt(localStorage.getItem(`clue_used_${id}`) || 1);
-        let finalPts = parseInt(t.Points) - ((cluesUsed - 1) * 5); 
-        if (finalPts < 5) finalPts = 5; // Floor of 5 points
-
-        alert(`🎉 Correct! You earned ${finalPts} points.`);
-        sendToSheet({ team: userTeam, site: site, taskId: id, type: 'clue', content: userAns, autoPts: finalPts });
-    } else {
-        alert("🔍 Not quite right. Look closer!");
-    }
+        const count = parseInt(localStorage.getItem(`clue_count_${id}`) || 1);
+        let pts = parseInt(t.Points) - ((count - 1) * 5);
+        if (pts < 5) pts = 5;
+        alert(`🎉 Correct! +${pts} Pts`);
+        sendSubmission({ team: userTeam, site: site, taskId: id, type: 'clue', content: userAns, autoPts: pts });
+    } else { alert("❌ Wrong answer!"); }
 }
+
 function submitWordGuess(id, target, site) {
     const t = challenges.find(task => task.TaskID === id);
     const guess = document.getElementById(`word-in-${id}`).value.toUpperCase();
-    
-    if (guess.length !== target.length) return alert(`Must be ${target.length} letters!`);
-    
-    // Cow & Bull Math logic here...
+    if (guess.length !== target.length) return alert("Wrong length!");
     let b = 0, c = 0;
     let tArr = target.split(""), gArr = guess.split("");
     for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]) { b++; tArr[i]=null; gArr[i]=null; }
     for(let i=0; i<gArr.length; i++) if(gArr[i] && tArr.includes(gArr[i])) { c++; tArr[tArr.indexOf(gArr[i])]=null; }
-    
     document.getElementById(`log-${id}`).innerHTML += `<div>${guess}: ${b}B ${c}C</div>`;
-    
     if (b === target.length) {
-        alert("🎊 WORD UNLOCKED!");
-        sendToSheet({ team: userTeam, site: site, taskId: id, type: 'word', content: guess, autoPts: t.Points });
+        alert("🎊 WORD DISCOVERED!");
+        sendSubmission({ team: userTeam, site: site, taskId: id, type: 'word', content: guess, autoPts: t.Points });
     }
 }
 
-// --- TEACHER ADMIN LOGIC ---
+function submitMedia(id, site) {
+    if(!document.getElementById(`check-${id}`).checked) return alert("Please check the box first!");
+    sendSubmission({ team: userTeam, site: site, taskId: id, type: 'media', content: "Media Uploaded", autoPts: 0 });
+}
+
+function submitShort(id, site) {
+    const val = document.getElementById(`text-${id}`).value;
+    if(!val) return alert("Answer cannot be empty!");
+    sendSubmission({ team: userTeam, site: site, taskId: id, type: 'short', content: val, autoPts: 0 });
+}
+
+// --- TEACHER ADMIN ---
 function openAdmin() {
-    if (prompt("Passcode:") === "KARNATAKA2026") {
+    if (prompt("Teacher HQ Passcode:") === "KARNATAKA2026") {
         showView('admin-view');
         loadPendingReviews();
     }
@@ -212,38 +219,31 @@ function openAdmin() {
 
 async function loadPendingReviews() {
     const list = document.getElementById('pending-list');
-    list.innerHTML = "Loading...";
-    const res = await fetch(`${SCRIPT_URL}?action=getPending`);
-    const tasks = await res.json();
-    list.innerHTML = tasks.map(t => `
-        <div class="task-item">
-            <strong>${t.team}</strong> (${t.loc})<br>
-            <em>${t.type}: ${t.content}</em><br>
-            <input type="number" id="pts-${t.row}" placeholder="Points">
-            <button onclick="gradeTask(${t.row})">Award</button>
-        </div>
-    `).join('') || "No pending tasks!";
+    list.innerHTML = "Fetching pending tasks...";
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=getPending`);
+        const tasks = await res.json();
+        list.innerHTML = tasks.map(t => `
+            <div class="task-item">
+                <strong>Team ${t.team}</strong> (${t.loc})<br>
+                <em>${t.type}: ${t.content}</em><br>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <input type="number" id="pts-${t.row}" placeholder="Points" style="width:70px">
+                    <button class="primary-btn" onclick="gradeTask(${t.row})">Award</button>
+                </div>
+            </div>
+        `).join('') || "All submissions graded!";
+    } catch (e) { list.innerHTML = "Error loading submissions."; }
 }
 
-async function gradeTask(row) {
-    const pts = document.getElementById(`pts-${row}`).value;
-    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'grade', row: row, pts: pts }) });
-    alert("Points Assigned!");
+async function gradeTask(rowId) {
+    const pts = document.getElementById(`pts-${rowId}`).value;
+    if(!pts) return alert("Enter points!");
+    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'grade', row: rowId, pts: pts }) });
+    alert("Points Assigned.");
     loadPendingReviews();
 }
 
 function resetGameForUser() {
-    if(confirm("Wipe THIS device?")) { localStorage.clear(); location.reload(); }
-}
-
-async function updateScoreDisplay() {
-    // Optional: Fetch total points for the logged in team and update #my-pts
-}
-
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('Offline Engine Active'))
-      .catch(err => console.log('Offline Engine Failed', err));
-  });
+    if(confirm("⚠️ WIPE PROGRESS ON THIS DEVICE?")) { localStorage.clear(); location.reload(); }
 }
