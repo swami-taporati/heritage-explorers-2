@@ -120,7 +120,33 @@ function createTaskUI(t) {
     div.innerHTML = html;
     return div;
 }
+async function renderLeaderboard() {
+    const res = await fetch(`${SCRIPT_URL}?action=getLeaderboard`);
+    const leaderboard = await res.json();
+    
+    // Check if Teacher has announced final scores
+    const announceRes = await fetch(`${SCRIPT_URL}?action=checkAnnounce`);
+    const announceData = await announceRes.json();
+    const isFinal = announceData && announceData.announced;
 
+    const container = document.getElementById('leaderboard-container');
+    container.innerHTML = leaderboard.map((team, index) => {
+        let medal = "";
+        // If it's the final, add medals to the top 3
+        if (isFinal) {
+            if (index === 0) medal = "🥇 ";
+            else if (index === 1) medal = "🥈 ";
+            else if (index === 2) medal = "🥉 ";
+        }
+
+        return `
+            <div class="score-row ${isFinal && index === 0 ? 'winner-glow' : ''}">
+                <span>${medal}${team.name}</span>
+                <span>${team.score} pts</span>
+            </div>
+        `;
+    }).join("");
+}
 function unlockSite(site) {
     const val = document.getElementById(`code-${site}`).value.toUpperCase();
     const correct = challenges.find(c => c.Site === site).SiteCode.toString().toUpperCase();
