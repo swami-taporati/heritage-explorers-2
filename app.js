@@ -53,21 +53,22 @@ async function approveTask(row) {
     if (!pts) return alert("Please enter points!");
 
     const payload = {
-        action: "grade", // Tells the script this is an admin action
-        row: row,        // The specific row number in GSheet
+        action: "grade",
+        row: row,
         pts: parseInt(pts)
     };
 
     try {
         await fetch(SCRIPT_URL, { 
             method: 'POST', 
-            mode: 'no-cors', // Essential for cross-domain Google Script
+            mode: 'no-cors', // <--- Add this line
             body: JSON.stringify(payload) 
         });
-        alert("Submission Approved!");
-        renderPending(); // Refreshes the list to remove the graded item
+        
+        alert("Success! Points assigned.");
+        renderPending(); // Refresh the list to remove the item you just graded
     } catch (e) {
-        alert("Error approving task.");
+        alert("Grading failed.");
     }
 }
 async function renderPending() {
@@ -204,21 +205,22 @@ function unlockSite(site) {
 
 async function sendSubmission(payload) {
     try {
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        await fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            mode: 'no-cors', // <--- Add this line
+            body: JSON.stringify(payload) 
+        });
+        
+        // Save locally that it's done so it turns grey
         localStorage.setItem(`done_${payload.taskId}`, "true");
         renderQuests();
+        
+        // Wait 2 seconds for Google to process, then update the score display
         setTimeout(updateScoreDisplay, 2000);
-    } catch (e) { alert("Submit failed."); }
+    } catch (e) { 
+        alert("Submit failed. Check your connection."); 
+    }
 }
-
-function submitQuiz(id, site, idx) {
-    const t = challenges.find(x => x.TaskID === id);
-    const isCorrect = (idx == t.CorrectAns);
-    const pts = isCorrect ? parseInt(t.Points) : 0;
-    if(isCorrect) alert("Correct!"); else alert("Incorrect.");
-    sendSubmission({ team: userTeam, site: site, taskId: id, type: 'quiz', content: `Choice ${idx}`, autoPts: pts });
-}
-
 function nextClue(id, cluesStr) {
     const clues = cluesStr.split("|");
     currentCluesUsed[id] = (currentCluesUsed[id] || 1);
