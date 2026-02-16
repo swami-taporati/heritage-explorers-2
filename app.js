@@ -50,21 +50,24 @@ function initTeams() {
 
 async function approveTask(row) {
     const pts = document.getElementById(`pts-${row}`).value;
-    if (!pts) return alert("Enter points first!");
+    if (!pts) return alert("Please enter points!");
 
     const payload = {
-        action: "grade",
-        row: row,
+        action: "grade", // Tells the script this is an admin action
+        row: row,        // The specific row number in GSheet
         pts: parseInt(pts)
     };
 
     try {
-        // We use POST to send the grading instruction
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-        alert("Success! Points assigned.");
-        renderPending(); // Refresh the list
+        await fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            mode: 'no-cors', // Essential for cross-domain Google Script
+            body: JSON.stringify(payload) 
+        });
+        alert("Submission Approved!");
+        renderPending(); // Refreshes the list to remove the graded item
     } catch (e) {
-        alert("Grading failed.");
+        alert("Error approving task.");
     }
 }
 async function renderPending() {
