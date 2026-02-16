@@ -63,8 +63,14 @@ function logout() { localStorage.removeItem('activeTeam'); location.reload(); }
 function loadDashboard() {
     const container = document.getElementById('quest-container');
     const completed = JSON.parse(localStorage.getItem('completedLevels') || "[]");
-    document.getElementById('user-team-display').innerHTML = `${TEAM_CONFIG[currentTeam].icon} <span>${currentTeam}</span>`;
-    container.innerHTML = "";
+    
+    // Add the Drive Button at the top
+    container.innerHTML = `
+        <div class="drive-box">
+            <p>📁 Upload photos to your Team Drive first:</p>
+            <a href="${DRIVE_LINKS[currentTeam]}" target="_blank" class="drive-btn">Open Team Drive</a>
+        </div>
+    `;
 
     QUEST_DATA.forEach(q => {
         const isDone = completed.includes(q.id);
