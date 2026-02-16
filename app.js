@@ -33,7 +33,7 @@ function initTeams() {
         const btn = document.createElement('div');
         btn.className = "team-btn";
         btn.innerHTML = `
-            <img src="./icons/${t}.png" class="team-icon" onerror="this.src='https://img.icons8.com/color/96/group.png'">
+            <img src="./images/${t}.png" class="team-icon" onerror="this.src='https://img.icons8.com/color/96/group.png'">
             <div class="team-label">${t}</div>
         `;
         btn.onclick = () => openPin(t);
