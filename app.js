@@ -201,3 +201,11 @@ function resetGameForUser() {
 async function updateScoreDisplay() {
     // Optional: Fetch total points for the logged in team and update #my-pts
 }
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('Offline Engine Active'))
+      .catch(err => console.log('Offline Engine Failed', err));
+  });
+}
