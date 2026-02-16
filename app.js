@@ -224,7 +224,7 @@ function submitQuiz(id, site, idx) {
     const container = document.querySelector(`[onclick*="${id}"]`).parentElement;
     const buttons = container.querySelectorAll('.quiz-opt');
     
-    // 1. Visual Feedback: Highlight the selected button
+    // 1. Visual Feedback: Highlight selection
     buttons.forEach((btn, i) => {
         btn.disabled = true; // Prevent double-clicking
         if (i === idx) {
@@ -232,51 +232,78 @@ function submitQuiz(id, site, idx) {
             btn.style.color = "white";
             btn.innerText = "Selected...";
         } else {
-            btn.style.opacity = "0.5";
+            btn.style.opacity = "0.4";
         }
     });
 
-    // 2. Tiny delay so the student sees their choice
+    // 2. Process Result after a short delay
     setTimeout(() => {
         const isCorrect = (idx == t.CorrectAns);
         const pts = isCorrect ? parseInt(t.Points) : 0;
         
         if (isCorrect) {
-            alert("🌟 Correct! +" + pts + " points.");
+            alert(`🌟 Correct! +${pts} points.`);
         } else {
-            alert("❌ Incorrect. 0 points assigned.");
+            alert("❌ Incorrect. 0 points assigned for this quiz.");
         }
         
-        // 3. Send to Google Sheets
         sendSubmission({ 
             team: userTeam, 
             site: site, 
             taskId: id, 
             type: 'quiz', 
-            content: `Picked: ${idx}`, 
+            content: `Selected Option: ${idx}`, 
             autoPts: pts 
         });
-    }, 600); // 0.6 second delay
+    }, 600);
 }
 
 function nextClue(id, cluesStr) {
     const clues = cluesStr.split("|");
-    let count = parseInt(localStorage.getItem(`clue_count_${id}`) || 1);
-    if (count < clues.length) {
-        count++;
-        localStorage.setItem(`clue_count_${id}`, count);
-        document.getElementById(`clue-text-${id}`).innerText = `Clue ${count}: ${clues[count-1]}`;
+    let currentCount = parseInt(localStorage.getItem(`clue_count_${id}`) || 1);
+    
+    if (currentCount < clues.length) {
+        currentCount++;
+        localStorage.setItem(`clue_count_${id}`, currentCount);
+        
+        // Update the text on screen
+        const textElement = document.getElementById(`clue-text-${id}`);
+        textElement.innerText = `Clue ${currentCount}: ${clues[currentCount - 1]}`;
+        
+        // Optional: briefly pulse the text so they notice the change
+        textElement.style.background = "#fff9c4"; 
+    } else {
+        alert("No more clues available for this task!");
     }
 }
 
 function submitClue(id, site) {
     const t = challenges.find(x => x.TaskID === id);
-    const ans = document.getElementById(`in-${id}`).value.toUpperCase().trim();
+    const inputField = document.getElementById(`in-${id}`);
+    const ans = inputField.value.toUpperCase().trim();
+    
     if (ans === t.CorrectAns.toString().toUpperCase().trim()) {
         const count = parseInt(localStorage.getItem(`clue_count_${id}`) || 1);
-        const pts = Math.max(parseInt(t.Points) - ((count - 1) * 5), 5);
-        sendSubmission({ team: userTeam, site: site, taskId: id, type: 'clue', content: ans, autoPts: pts });
-    } else { alert("Try again!"); }
+        
+        // Deduction: -5 points for every extra clue used
+        // Minimum points allowed is 5 so they always get something
+        const penalty = (count - 1) * 5;
+        const finalPts = Math.max(parseInt(t.Points) - penalty, 5);
+
+        alert(`🎉 Correct! You used ${count} clue(s). Points: ${finalPts}`);
+        
+        sendSubmission({ 
+            team: userTeam, 
+            site: site, 
+            taskId: id, 
+            type: 'clue', 
+            content: ans, 
+            autoPts: finalPts 
+        });
+    } else {
+        alert("❌ Not quite right. Try again!");
+        inputField.value = ""; // Clear for next try
+    }
 }
 
 function submitCowBull(id, target, site) {
