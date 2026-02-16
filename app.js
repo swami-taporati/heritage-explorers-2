@@ -1,5 +1,45 @@
 const TEAM_PINS = { "Indian Roller": "1234", "Asian Elephant": "5678", "Lotus": "1111", "Sandalwood": "2222", "Mango": "3333" };
 let currentTeam = localStorage.getItem('activeTeam') || null;
+const QUEST_DATA = [
+    { day: 2, loc: "Bannerghatta", code: "WILD26", task: "PHOTO: Capture a herbivore and a carnivore (safari). QUIZ: Which animal is the state animal of Karnataka?", type: "Mixed", auto: 10 },
+    { day: 2, loc: "Music Museum", code: "RAGA", task: "VIDEO: Record a 10-second clip of a team member trying a traditional instrument.", type: "Video", auto: 0 },
+    { day: 3, loc: "Hampi (Virupaksha)", code: "RAYA", task: "PHOTO: Find the 'Inverted Shadow' of the temple tower. QUIZ: Which empire ruled from here?", type: "Mixed", auto: 10 },
+    { day: 4, loc: "Hampi (Vittala)", code: "CHARIOT", task: "PHOTO: Pose like the stone chariot behind you. TASK: Count the number of pillars in the musical hall.", type: "Photo", auto: 5 },
+    { day: 4, loc: "JSW Kaladham", code: "STEEL", task: "PHOTO: Take a creative group photo with the 3D Hampi exhibits.", type: "Photo", auto: 0 },
+    { day: 6, loc: "Chitradurga", code: "OBAVVA", task: "VIDEO: Re-enact the story of Onake Obavva at the 'Kalla Kindi' (secret opening).", type: "Video", auto: 0 },
+    { day: 7, loc: "Agumbe", code: "RAIN", task: "IDENTIFY: Find 3 types of medicinal plants with the help of a farmer and list them.", type: "Text", auto: 10 },
+    { day: 8, loc: "Sringeri", code: "SHARADA", task: "QUIZ: Name the river flowing beside the temple. PHOTO: The zodiac pillars (Rashistambhas).", type: "Mixed", auto: 10 },
+    { day: 8, loc: "Bhoota Kola", code: "SPIRIT", task: "VIDEO: Record a short clip of the ritual dance and describe the emotion in one word.", type: "Video", auto: 0 },
+    { day: 9, loc: "Kambala", code: "BUFFALO", task: "PHOTO: A selfie with the racing track in the background. QUIZ: What are the animals used in this race?", type: "Mixed", auto: 10 }
+];
+
+function addDynamicQuest() {
+    const newLoc = prompt("Enter New Location (e.g., Udupi):");
+    const newCode = prompt("Set Unlock Code:");
+    const newTask = prompt("Enter the Challenge Description:");
+
+    if (newLoc && newCode && newTask) {
+        QUEST_DATA.push({
+            day: "Extra",
+            loc: newLoc,
+            code: newCode.toUpperCase(),
+            task: newTask,
+            type: "Dynamic",
+            auto: 0
+        });
+        alert("Challenge Added! Give the code " + newCode + " to students when ready.");
+        loadDashboard(); // Refresh the list
+    }
+}
+
+function checkFinalReveal() {
+    const completed = JSON.parse(localStorage.getItem('completedLevels') || "[]");
+    if (completed.length === QUEST_DATA.length) {
+        alert("✨ GRAND REVEAL UNLOCKED! ✨\nYour Clue Pieces: 'The first key to the lost empire lies within the spirit of Karnataka.'");
+        // You could also redirect to a special 'Winner' page
+    }
+}
+
 
 // Offline Save Logic
 function saveProgress(data) {
@@ -86,6 +126,8 @@ function submitToTeacher(payload) {
         saveOffline(payload);
     });
 }
+
+
 function resetAllTeams() {
     if(confirm("This will wipe all scores and progress. Continue?")) {
         localStorage.clear();
