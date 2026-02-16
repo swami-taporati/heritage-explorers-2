@@ -1,21 +1,24 @@
-:root { --primary: #C80E13; --bg: #f4f1ea; --card: #ffffff; }
-body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; text-align: center; }
-header { background: var(--primary); color: white; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+:root { --primary: #C80E13; --accent: #F2D53C; --bg: #f4f1ea; --dark: #333; }
+body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; color: var(--dark); }
+header { background: var(--primary); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--accent); }
+h1 { font-family: 'Cinzel', serif; font-size: 1rem; margin: 0; }
 
-.team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 20px; }
-.team-btn { background: var(--card); border: 2px solid #333; padding: 20px; border-radius: 10px; font-weight: bold; }
+.section-title { margin-top: 20px; font-family: 'Cinzel', serif; }
+.team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+.team-btn { background: white; border: 2px solid var(--dark); padding: 20px; border-radius: 12px; font-weight: bold; cursor: pointer; }
 
-.quest-card { background: var(--card); margin: 15px; padding: 15px; border-radius: 10px; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-.locked-task { opacity: 0.6; background: #eee; border: 1px dashed #999; pointer-events: none; }
+.quest-card { background: white; margin: 15px; padding: 15px; border-radius: 12px; border-left: 6px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.task-item { background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #ddd; }
+.locked-task { opacity: 0.6; background: #e0e0e0 !important; pointer-events: none; border: 1px dashed #999; }
 
-.clue-btn { background: #5d4037; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin: 5px 0; }
-.submit-btn { width: 100%; background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 5px; margin-top: 10px; }
+.quiz-opt { display: block; width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 6px; background: white; text-align: left; }
+.submit-btn { width: 100%; background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; margin-top: 10px; }
+.primary-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; }
+.danger-btn { background: #d32f2f; color: white; border: none; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
 
-.sync-btn { position: fixed; bottom: 20px; right: 20px; border-radius: 50px; padding: 15px 25px; background: #333; color: white; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+.puzzle-log { background: #222; color: #0f0; font-family: monospace; padding: 10px; border-radius: 5px; margin: 10px 0; max-height: 80px; overflow-y: auto; font-size: 0.8rem; }
+.sync-btn { position: fixed; bottom: 20px; right: 20px; background: var(--dark); color: white; border: none; padding: 15px 20px; border-radius: 50px; font-weight: bold; z-index: 100; }
 
-.modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:center; }
-.modal-content { background:white; padding:30px; border-radius:10px; width:80%; }
-
-.puzzle-log {    background: #333;     color: #0f0;    font-family: monospace;    padding: 10px;    border-radius: 5px;    margin-bottom: 10px;    max-height: 100px;    overflow-y: auto;  font-size: 0.8em;}
-
-.danger-btn {    background: #ff4444;    color: white;    border: none;    padding: 10px;    border-radius: 5px;    font-weight: bold;}
+.modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index: 1000; }
+.modal-content { background:white; padding:30px; border-radius:15px; width:85%; max-width:400px; text-align: center; }
+#pin-input { width: 100%; font-size: 2rem; text-align: center; margin: 20px 0; border-radius: 8px; border: 1px solid #ccc; }
