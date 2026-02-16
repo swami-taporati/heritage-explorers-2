@@ -112,4 +112,98 @@ function unlockSite(site) {
         localStorage.setItem(`unlock_${site}`, "true");
         renderQuests();
     }
+    
+}
+
+// Add these variables to your app.js
+let currentClues = {}; 
+
+// --- NEW TASK TYPE: WORD PUZZLE (COW-BULL) ---
+function submitWordGuess(id, targetWord, site) {
+    const guess = document.getElementById(`word-in-${id}`).value.toUpperCase();
+    if (guess.length !== targetWord.length) return alert(`Word must be ${targetWord.length} letters!`);
+
+    let bulls = 0;
+    let cows = 0;
+    let targetArr = targetWord.split("");
+    let guessArr = guess.split("");
+
+    // Check Bulls
+    for (let i = 0; i < targetArr.length; i++) {
+        if (guessArr[i] === targetArr[i]) {
+            bulls++;
+            targetArr[i] = null;
+            guessArr[i] = null;
+        }
+    }
+    // Check Cows
+    for (let i = 0; i < guessArr.length; i++) {
+        if (guessArr[i] && targetArr.includes(guessArr[i])) {
+            cows++;
+            targetArr[targetArr.indexOf(guessArr[i])] = null;
+        }
+    }
+
+    const log = document.getElementById(`log-${id}`);
+    log.innerHTML += `<div>${guess}: ${bulls} Bulls, ${cows} Cows</div>`;
+
+    if (bulls === targetWord.length) {
+        alert("🎉 Correct! Word Unlocked.");
+        postData({ team: userTeam, site: site, taskId: id, type: 'word', content: guess, autoPts: 25 });
+    }
+}
+
+// --- NEW TASK TYPE: CLUE PROGRESSION ---
+function nextClue(id, cluesString) {
+    const clues = cluesString.split("|");
+    if (!currentClues[id]) currentClues[id] = 1;
+    
+    if (currentClues[id] < clues.length) {
+        currentClues[id]++;
+        document.getElementById(`text-${id}`).innerText = "Clue " + currentClues[id] + ": " + clues[currentClues[id]-1];
+        localStorage.setItem(`clue_used_${id}`, currentClues[id]);
+    } else {
+        alert("No more clues available!");
+    }
+}
+
+// --- TEACHER RESET LOGIC ---
+function resetGameForUser() {
+    const confirmReset = confirm("CRITICAL: This will wipe ALL progress on THIS device. Points already in the Google Sheet will remain, but the student can re-submit everything. Proceed?");
+    if (confirmReset) {
+        localStorage.clear();
+        alert("Device Reset Successful.");
+        location.reload();
+    }
+}
+
+// --- UPDATED TASK UI GENERATOR ---
+function createTaskUI(t) {
+    const div = document.createElement('div');
+    const isDone = localStorage.getItem(`done_${t.TaskID}`);
+    div.className = `task-item ${isDone ? 'locked-task' : ''}`;
+    
+    if (isDone) {
+        div.innerHTML = `<p>✅ Task Completed: ${t.Question}</p>`;
+        return div;
+    }
+
+    if (t.Type === 'word') {
+        div.innerHTML = `
+            <p><strong>Grand Challenge:</strong> Guess the ${t.Answer_Pts.length} letter word.</p>
+            <div id="log-${t.TaskID}" class="puzzle-log"></div>
+            <input type="text" id="word-in-${t.TaskID}" maxlength="${t.Answer_Pts.length}" placeholder="Enter guess">
+            <button class="submit-btn" onclick="submitWordGuess('${t.TaskID}','${t.Answer_Pts}','${t.Site}')">Guess</button>
+        `;
+    } else if (t.Type === 'clue') {
+        const clues = t.Options_Clues.split("|");
+        div.innerHTML = `
+            <p id="text-${t.TaskID}">Clue 1: ${clues[0]}</p>
+            <button class="clue-btn" onclick="nextClue('${t.TaskID}','${t.Options_Clues}')">Get Next Clue</button>
+            <input type="text" id="in-${t.TaskID}" placeholder="Your Answer">
+            <button class="submit-btn" onclick="submitClue('${t.TaskID}','${t.Site}','${t.Answer_Pts}')">Solve</button>
+        `;
+    }
+    // ... (Keep 'quiz' and 'media' logic from previous step)
+    return div;
 }
