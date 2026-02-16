@@ -1,6 +1,11 @@
 /* ==========================================
    CONFIG & DATA
    ========================================== */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .then(() => console.log("Service Worker Active: Offline Mode Ready"))
+    .catch(err => console.log("Service Worker Error", err));
+}
 const GOOGLE_SCRIPT_URL = "YOUR_DEPLOYED_WEB_APP_URL";
 
 const TEAM_CONFIG = {
