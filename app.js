@@ -34,6 +34,21 @@ function handleAdminTap(e) {
     }
 }
 
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwus5oJWiCpHM-lODpl2Ttleq2vNb7ZPEnxeBYMgQ2NB6lc15at8NysJrE3ZLCq01NN/exec";
+
+function submitToTeacher(payload) {
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors', // Important for cross-domain
+        cache: 'no-cache',
+        body: JSON.stringify(payload)
+    }).then(() => {
+        alert("Sent to teacher for approval! Keep exploring.");
+    }).catch(err => {
+        // If offline, save to a 'pending' list in LocalStorage to sync later
+        saveOffline(payload);
+    });
+}
 function resetAllTeams() {
     if(confirm("This will wipe all scores and progress. Continue?")) {
         localStorage.clear();
