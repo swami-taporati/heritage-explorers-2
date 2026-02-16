@@ -21,54 +21,69 @@
     <section id="main-view" style="display:none">
         <div class="team-banner">
             <span id="active-team-banner">Team Name</span>
-            <div>Pts: <span id="my-pts">0</span></div>
+            <div>Pts: <span id="my-pts" style="font-weight:bold; color:gold;">0</span></div>
         </div>
-        <div id="leaderboard-section" style="margin-top:20px; border-top: 2px solid #ddd; padding-top:10px;">
-    <h3>Live Leaderboard</h3>
-    <div id="leaderboard-container">
-        <p>Loading scores...</p>
-    </div>
-    <button class="quiz-opt" onclick="updateLeaderboard()">🔄 Refresh Scores</button>
-</div>
-        <div class="controls">
-            <button class="sync-btn" onclick="syncData()">🔄 Sync Challenges</button>
+
+        <div class="controls" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px;">
+            <button class="sync-btn" onclick="syncData()" style="font-size: 0.9em; padding: 12px;">🔄 Sync Tasks</button>
+            <button class="quiz-opt" onclick="updateLeaderboard()" style="margin:0; font-size: 0.9em; padding: 12px; background: #eee;">📊 Leaderboard</button>
         </div>
+
+        <div id="leaderboard-section" style="margin: 10px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd; padding: 10px;">
+            <h3 style="font-size: 0.9em; margin-top: 0; color: #666;">🏆 Live Standings</h3>
+            <div id="leaderboard-container" style="font-size: 0.9em;">
+                <p>Loading scores...</p>
+            </div>
+        </div>
+
         <div id="quest-container"></div>
+
         <div style="margin-top: 30px; padding: 20px; text-align: center;">
-    <button class="logout-btn" onclick="logout()" style="opacity: 0.7; font-size: 0.8em;">
-        🚪 Switch Team / Logout
-    </button>
-</div>
+            <button class="logout-btn" onclick="logout()" style="opacity: 0.7; font-size: 0.8em; padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd; background: white; cursor: pointer;">
+                🚪 Switch Team / Logout
+            </button>
+        </div>
     </section>
 
     <section id="admin-view" style="display:none">
         <div class="header-box">
             <h2>Teacher HQ</h2>
-            <button onclick="showView('selection-view')" class="back-btn">← Back</button>
+            <button onclick="showView('selection-view')" class="back-btn" style="margin-bottom: 10px;">← Back</button>
         </div>
-        <div id="pending-list" class="admin-list"></div>
-        <hr>
-        <button class="danger-btn" onclick="resetGameForUser()">⚠️ Reset This Device</button>
+        
+        <div id="pending-list" class="admin-list">
+            </div>
+        
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+        
+        <div style="padding: 10px; text-align: center;">
+            <button class="primary-btn" style="background: gold; color: black; margin-bottom: 15px;" onclick="announceWinner()">🏆 ANNOUNCE FINAL SCORES</button>
+            <br>
+            <button class="danger-btn" onclick="resetGameForUser()" style="background: #ff4444; color: white; border: none; padding: 10px; border-radius: 5px;">⚠️ Reset This Device</button>
+        </div>
     </section>
 
     <div id="pin-modal" class="modal" style="display:none">
         <div class="modal-content">
             <h3 id="target-team">Team Name</h3>
-            <input type="password" id="pin-input" inputmode="numeric" placeholder="Enter PIN">
+            <p style="font-size: 0.8em; color: #666;">Enter 4-digit PIN</p>
+            <input type="password" id="pin-input" inputmode="numeric" placeholder="0000" style="text-align: center; font-size: 1.5em; letter-spacing: 5px;">
             <div class="modal-btns">
                 <button onclick="checkLogin()" class="primary-btn">Login</button>
                 <button onclick="closeModal()" class="back-btn">Cancel</button>
             </div>
         </div>
     </div>
-<div id="winner-overlay" class="modal" style="display:none; background: rgba(0,0,0,0.95);">
-    <div class="modal-content" style="background: linear-gradient(45deg, #ffd700, #ffae00); color: #2c3e50;">
-        <h1 style="font-family: 'Cinzel', serif; font-size: 2.5em;">🏆 CHAMPIONS 🏆</h1>
-        <div id="winner-team-name" style="font-size: 2em; font-weight: bold; margin: 20px 0;">TEAM NAME</div>
-        <p id="winner-score" style="font-size: 1.5em;">With 000 Points!</p>
-        <button onclick="location.reload()" class="submit-btn" style="background: #2c3e50;">Celebrate!</button>
+
+    <div id="winner-overlay" class="modal" style="display:none; background: rgba(0,0,0,0.95); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; justify-content: center; align-items: center;">
+        <div class="modal-content" style="background: linear-gradient(45deg, #ffd700, #ffae00); color: #2c3e50; text-align: center; padding: 40px; border-radius: 15px;">
+            <h1 style="font-family: 'Cinzel', serif; font-size: 2.5em; margin: 0;">🏆 CHAMPIONS 🏆</h1>
+            <div id="winner-team-name" style="font-size: 2.2em; font-weight: bold; margin: 20px 0; text-transform: uppercase;">TEAM NAME</div>
+            <p id="winner-score" style="font-size: 1.5em; margin-bottom: 30px;">With 000 Points!</p>
+            <button onclick="location.reload()" class="submit-btn" style="background: #2c3e50; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Celebrate!</button>
+        </div>
     </div>
-</div>
+
     <script src="app.js"></script>
 </body>
 </html>
