@@ -30,10 +30,7 @@ function showView(id) {
     if(target) target.style.display = 'block';
 }
 
-function goBack() {
-    renderQuests();
-    window.scrollTo(0, 0);
-}
+function goBack() { renderQuests(); window.scrollTo(0, 0); }
 
 function initTeams() {
     const grid = document.getElementById('team-selector');
@@ -42,10 +39,7 @@ function initTeams() {
     Object.keys(TEAMS).forEach(t => {
         const btn = document.createElement('div');
         btn.className = "team-btn";
-        btn.innerHTML = `
-            <img src="./images/${t}.png" class="team-icon" onerror="this.src='https://img.icons8.com/color/96/group.png'">
-            <div class="team-label">${t}</div>
-        `;
+        btn.innerHTML = `<img src="./images/${t}.png" class="team-icon" onerror="this.src='https://img.icons8.com/color/96/group.png'"><div class="team-label">${t}</div>`;
         btn.onclick = () => openPin(t);
         grid.appendChild(btn);
     });
@@ -86,13 +80,14 @@ function renderQuests() {
     if(!cont) return;
     cont.innerHTML = "";
     
-    if (challenges.length === 0) {
+    // FIX: Filter out any challenges where SiteCode is missing or empty
+    const validChallenges = challenges.filter(c => c.SiteCode && c.SiteCode.toString().trim() !== "");
+
+    if (validChallenges.length === 0) {
         cont.innerHTML = "<p style='text-align:center; padding:20px;'>No challenges found. Please Sync.</p>";
         return;
     }
 
-    // FILTER: Only include challenges where SiteCode is present and not empty
-    const validChallenges = challenges.filter(c => c.SiteCode && c.SiteCode.toString().trim() !== "");
     const sites = [...new Set(validChallenges.map(c => c.Site))];
 
     sites.forEach(site => {
@@ -125,17 +120,23 @@ function createTaskUI(t) {
     const div = document.createElement('div');
     const isDone = localStorage.getItem(`done_${t.TaskID}`);
     div.className = `task-item ${isDone ? 'locked-task' : ''}`;
+    
     if (isDone) {
         div.innerHTML = `<p>✅ <strong>Completed:</strong> ${t.Question}</p>`;
         return div;
     }
+
     let html = `<p><strong>${t.Type.toUpperCase()}:</strong> ${t.Question}</p>`;
+    
     if (t.Type === 'quiz') {
         const opts = t.Options_Clues.split(",");
         html += `<div class="btn-group" style="display:flex; flex-direction:column; gap:8px;">`;
-        opts.forEach((o, i) => html += `<button class="quiz-opt" onclick="submitQuiz('${t.TaskID}','${t.Site}',${i})">${o.trim()}</button>`);
+        opts.forEach((o, i) => {
+            html += `<button class="quiz-opt" onclick="submitQuiz('${t.TaskID}','${t.Site}',${i}, event)">${o.trim()}</button>`;
+        });
         html += `</div>`;
-    } else if (t.Type === 'clue') {
+    } 
+    else if (t.Type === 'clue') {
         const clues = t.Options_Clues.split("|");
         html += `
             <p id="clue-text-${t.TaskID}" class="clue-display">Clue 1: ${clues[0]}</p>
@@ -143,20 +144,23 @@ function createTaskUI(t) {
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Answer...">
             <button class="submit-btn" onclick="submitClue('${t.TaskID}','${t.Site}')">Submit</button>
         `;
-    } else if (t.Type === 'cowbull') {
+    } 
+    else if (t.Type === 'cowbull') {
         html += `
-            <div id="log-${t.TaskID}" class="puzzle-log" style="font-family:monospace; background:#eee; padding:5px; margin:5px 0;">Target: ${t.CorrectAns.length} letters</div>
+            <div id="log-${t.TaskID}" class="puzzle-log">Target: ${t.CorrectAns.length} letters</div>
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Guess...">
             <button class="submit-btn" onclick="submitCowBull('${t.TaskID}','${t.CorrectAns}','${t.Site}')">Check</button>
         `;
-    } else if (t.Type === 'media') {
-        const folder = TEAMS[userTeam] ? TEAMS[userTeam].folder : "#";
+    } 
+    else if (t.Type === 'media') {
+        const folder = TEAMS[userTeam].folder;
         html += `
             <button class="clue-btn" style="background:#34a853; color:white;" onclick="window.open('${folder}', '_blank')">📁 Open Team Folder</button>
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Type 'DONE'...">
             <button class="submit-btn" onclick="submitManual('${t.TaskID}','${t.Site}','media')">Confirm</button>
         `;
-    } else {
+    } 
+    else {
         html += `
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Your answer...">
             <button class="submit-btn" onclick="submitManual('${t.TaskID}','${t.Site}','word')">Send</button>
@@ -169,9 +173,7 @@ function createTaskUI(t) {
 function unlockSite(site) {
     const val = document.getElementById(`code-${site}`).value.toUpperCase().trim();
     const siteData = challenges.find(c => c.Site === site);
-    if (!siteData) return;
-    const correct = siteData.SiteCode.toString().toUpperCase().trim();
-    if (val === correct) {
+    if (val === siteData.SiteCode.toString().toUpperCase().trim()) {
         localStorage.setItem(`unlock_${site}`, "true");
         renderQuests();
     } else { alert("Incorrect Site Code!"); }
@@ -185,28 +187,18 @@ async function sendSubmission(payload) {
     setTimeout(updateLeaderboard, 2000);
 }
 
-function submitQuiz(id, site, idx) {
+function submitQuiz(id, site, idx, event) {
     const t = challenges.find(x => x.TaskID === id);
     const isCorrect = (idx == t.CorrectAns);
     
-    // UI Feedback: Highlight the selected button
-    const taskElement = document.querySelector(`[onclick*="${id}"]`).parentElement;
-    const buttons = taskElement.querySelectorAll('.quiz-opt');
-    
-    // Remove previous selections and highlight current
-    buttons.forEach(btn => btn.style.border = "1px solid #ddd");
+    // FIX: Visual Feedback for quiz selection
+    const buttons = event.target.parentElement.querySelectorAll('.quiz-opt');
+    buttons.forEach(b => { b.style.opacity = "0.5"; b.disabled = true; });
+    event.target.style.opacity = "1";
     event.target.style.background = isCorrect ? "#27ae60" : "#e74c3c";
     event.target.style.color = "white";
 
-    sendSubmission({ 
-        team: userTeam, 
-        site: site, 
-        taskId: id, 
-        type: 'quiz', 
-        content: `Idx: ${idx}`, 
-        autoPts: isCorrect ? parseInt(t.Points) : 0 
-    });
-
+    sendSubmission({ team: userTeam, site: site, taskId: id, type: 'quiz', content: `Idx: ${idx}`, autoPts: isCorrect ? parseInt(t.Points) : 0 });
     alert(isCorrect ? "🌟 Correct!" : "❌ Incorrect.");
 }
 
@@ -235,8 +227,7 @@ function submitCowBull(id, target, site) {
     const guess = document.getElementById(`in-${id}`).value.toUpperCase().trim();
     if (guess.length !== target.length) return alert(`Need ${target.length} letters`);
     let b = 0, c = 0;
-    let tArr = target.toUpperCase().split("");
-    let gArr = guess.split("");
+    let tArr = target.toUpperCase().split(""), gArr = guess.split("");
     for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]) { b++; tArr[i]=null; gArr[i]=null; }
     for(let i=0; i<gArr.length; i++) if(gArr[i] && tArr.indexOf(gArr[i])!==-1) { c++; tArr[tArr.indexOf(gArr[i])]=null; }
     document.getElementById(`log-${id}`).innerHTML += `<div>${guess}: ${b}B, ${c}C</div>`;
@@ -257,8 +248,8 @@ async function updateScoreDisplay() {
     try {
         const res = await fetch(`${SCRIPT_URL}?action=getScore&team=${userTeam}`);
         const pts = await res.text();
-        if(document.getElementById('my-pts')) document.getElementById('my-pts').innerText = pts;
-    } catch(e) { console.log("Score update failed"); }
+        document.getElementById('my-pts').innerText = pts;
+    } catch(e) {}
 }
 
 async function updateLeaderboard() {
@@ -268,23 +259,19 @@ async function updateLeaderboard() {
         const res = await fetch(`${SCRIPT_URL}?action=getLeaderboard`);
         const data = await res.json();
         data.sort((a, b) => b.score - a.score);
-        container.innerHTML = data.map((item, index) => `
-            <div class="score-row"><span>${index + 1}. ${item.team}</span><span><strong>${item.score}</strong></span></div>
-        `).join("");
-    } catch (e) { container.innerHTML = "<p>Leaderboard unavailable offline</p>"; }
+        container.innerHTML = data.map((item, index) => `<div class="score-row"><span>${index + 1}. ${item.team}</span><span><strong>${item.score}</strong></span></div>`).join("");
+    } catch (e) { container.innerHTML = "<p>Offline</p>"; }
 }
 
 async function triggerFinalReveal() {
-    if (!confirm("Ready to reveal the final winner on this device?")) return;
     try {
         const res = await fetch(`${SCRIPT_URL}?action=getLeaderboard`);
         const data = await res.json();
         data.sort((a, b) => b.score - a.score);
-        const winner = data[0];
-        document.getElementById('winner-team-name').innerText = winner.team;
-        document.getElementById('winner-score').innerText = `With ${winner.score} Points!`;
+        document.getElementById('winner-team-name').innerText = data[0].team;
+        document.getElementById('winner-score').innerText = `With ${data[0].score} Points!`;
         document.getElementById('winner-overlay').style.display = 'flex';
-    } catch (e) { alert("Error fetching scores. Check internet."); }
+    } catch (e) { alert("Check internet"); }
 }
 
 function logout() { localStorage.removeItem('team'); location.reload(); }
@@ -294,20 +281,17 @@ async function renderPending() {
     const res = await fetch(`${SCRIPT_URL}?action=getPending`);
     const data = await res.json();
     document.getElementById('pending-list').innerHTML = data.map(i => `
-        <div class="quest-card" style="border-left:5px solid gold;">
-            <p><strong>Team:</strong> ${i.team}</p>
-            <p><strong>Answer:</strong> ${i.content}</p>
-            <input type="number" id="p-${i.row}" placeholder="Points" style="width:80px; padding:5px;">
-            <button onclick="approveTask(${i.row})" style="padding:5px 10px; background:green; color:white; border:none; border-radius:4px;">Approve</button>
+        <div class="quest-card">
+            <p><strong>${i.team}</strong>: ${i.content}</p>
+            <input type="number" id="p-${i.row}" placeholder="Pts" style="width:60px">
+            <button onclick="approveTask(${i.row})">Approve</button>
         </div>`).join("");
 }
 
 async function approveTask(row) {
     const pts = document.getElementById(`p-${row}`).value;
-    if(!pts) return alert("Enter points");
     await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "grade", row: row, pts: pts })});
-    alert("Graded!");
     renderPending();
 }
 
-function resetGameForUser() { if(confirm("This will clear all progress on THIS device. Proceed?")) { localStorage.clear(); location.reload(); } }
+function resetGameForUser() { if(confirm("Clear local device?")) { localStorage.clear(); location.reload(); } }
