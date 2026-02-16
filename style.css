@@ -1,0 +1,54 @@
+:root {
+    --kn-red: #C80E13;
+    --kn-yellow: #F2D53C;
+    --hampi-sand: #E1B382;
+}
+
+body {
+    background-color: var(--hampi-sand);
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    text-align: center;
+}
+
+header {
+    background: var(--kn-red);
+    color: white;
+    padding: 20px;
+    border-bottom: 5px solid var(--kn-yellow);
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 20px;
+}
+
+.team-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.back-btn {
+    background: #666;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+button {
+    background: var(--kn-red);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    margin: 10px;
+}
