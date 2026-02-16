@@ -11,8 +11,14 @@ const GOOGLE_SCRIPT_URL = "YOUR_DEPLOYED_WEB_APP_URL";
 const TEAM_CONFIG = {
     "Indian Roller": { pin: "4921", icon: "🐦" },
     "Asian Elephant": { pin: "8374", icon: "🐘" },
-    "Lotus": { pin: "2569", icon: "🪷" },
-    "Sandalwood": { pin: "7103", icon: "🪵" },
+    "Lotus": { 
+        pin: "2569", 
+        icon: '<img src="https://img.icons8.com/color/96/lotus.png" class="team-img" alt="Lotus">' 
+    },
+    "Sandalwood": { 
+        pin: "7103", 
+        icon: '<img src="https://img.icons8.com/color/96/sandalwood.png" class="team-img" alt="Sandalwood">' 
+    },
     "Mango": { pin: "6482", icon: "🥭" }
 };
 
