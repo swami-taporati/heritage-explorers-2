@@ -12,26 +12,22 @@
     <section id="selection-view">
         <div class="header-box">
             <h1>Heritage Engine</h1>
-            <p>Select your team to begin</p>
+            <p>Select your team</p>
         </div>
         <div id="team-selector" class="team-grid"></div>
-        <hr>
         <button class="admin-btn" onclick="openAdmin()">🔑 Teacher HQ</button>
     </section>
 
     <section id="main-view" style="display:none">
         <div class="team-banner">
-            <span id="active-team-banner">Loading Team...</span>
-            <div id="score-display">Pts: <span id="my-pts">0</span></div>
+            <span id="active-team-banner">Team Name</span>
+            <div>Pts: <span id="my-pts">0</span></div>
         </div>
-        
         <div class="controls">
             <button class="sync-btn" onclick="syncData()">🔄 Sync Challenges</button>
         </div>
-
         <div id="quest-container"></div>
-
-        <button class="logout-btn" onclick="logout()">Change Team / Logout</button>
+        <button class="logout-btn" onclick="logout()">Change Team</button>
     </section>
 
     <section id="admin-view" style="display:none">
@@ -39,7 +35,7 @@
             <h2>Teacher HQ</h2>
             <button onclick="showView('selection-view')" class="back-btn">← Back</button>
         </div>
-        <div id="pending-list"></div>
+        <div id="pending-list" class="admin-list"></div>
         <hr>
         <button class="danger-btn" onclick="resetGameForUser()">⚠️ Reset This Device</button>
     </section>
@@ -47,7 +43,7 @@
     <div id="pin-modal" class="modal" style="display:none">
         <div class="modal-content">
             <h3 id="target-team">Team Name</h3>
-            <input type="password" id="pin-input" pattern="\[0-9]*" inputmode="numeric" placeholder="Enter PIN">
+            <input type="password" id="pin-input" inputmode="numeric" placeholder="Enter PIN">
             <div class="modal-btns">
                 <button onclick="checkLogin()" class="primary-btn">Login</button>
                 <button onclick="closeModal()" class="back-btn">Cancel</button>
