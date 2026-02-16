@@ -215,9 +215,29 @@ function submitCowBull(id, target, site) {
 }
 
 function submitManual(id, site, type) {
-    const val = document.getElementById(`in-${id}`).value;
-    sendSubmission({ team: userTeam, site: site, taskId: id, type: type, content: val, autoPts: 0 });
-    alert("Sent for approval!");
+    const inputElement = document.getElementById(`in-${id}`);
+    const val = inputElement.value.trim();
+
+    if (val.length < 2) {
+        alert("Please type a proper answer before sending!");
+        return;
+    }
+
+    // Visual feedback
+    const btn = event.target;
+    btn.innerText = "⌛ Sending...";
+    btn.disabled = true;
+
+    sendSubmission({ 
+        team: userTeam, 
+        site: site, 
+        taskId: id, 
+        type: type, 
+        content: val, 
+        autoPts: 0 // Always 0 because Teacher decides the points
+    }).then(() => {
+        alert("🚀 Sent to Teacher HQ! Check back later for points.");
+    });
 }
 
 async function updateScoreDisplay() {
