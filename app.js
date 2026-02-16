@@ -278,12 +278,12 @@ async function triggerFinalReveal() {
 function logout() { localStorage.removeItem('team'); location.reload(); }
 function openAdmin() {
     const pass = prompt("Enter Teacher HQ Password:");
-    if (pass === null) return; // User clicked cancel
+    if (pass === null) return; 
 
     if (pass === "KARNATAKA2026") {
         showView('admin-view');
         renderPending();
-        updateAdminLeaderboard(); // Load standings into HQ
+        updateAdminLeaderboard(); 
     } else {
         alert("❌ Access Denied: Incorrect Password");
     }
@@ -321,7 +321,7 @@ async function updateAdminLeaderboard() {
     const container = document.getElementById('admin-leaderboard-container');
     if(!container) return;
     
-    container.innerHTML = "⏳ Loading standings...";
+    container.innerHTML = "⏳ Updating...";
     try {
         const res = await fetch(`${SCRIPT_URL}?action=getLeaderboard`);
         const data = await res.json();
