@@ -1,153 +1,28 @@
-:root {
-    --kn-red: #C80E13;
-    --kn-yellow: #F2D53C;
-    --hampi-sand: #E1B382;
-}
+:root { --kn-red: #C80E13; --kn-yellow: #F2D53C; --hampi-sand: #E1B382; }
+body { background: var(--hampi-sand); font-family: 'Poppins', sans-serif; margin: 0; text-align: center; }
+header { background: var(--kn-red); color: white; padding: 15px; border-bottom: 4px solid var(--kn-yellow); }
+h1 { font-family: 'Cinzel', serif; margin: 0; font-size: 1.4em; }
 
-body {
-    background-color: var(--hampi-sand);
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    text-align: center;
-}
+.team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+.team-card { background: white; padding: 15px; border-radius: 12px; border: 2px solid #5d4037; font-weight: bold; }
+.team-card img { width: 60px; height: 60px; margin-bottom: 5px; }
 
-header {
-    background: var(--kn-red);
-    color: white;
-    padding: 20px;
-    border-bottom: 5px solid var(--kn-yellow);
-}
+#main-nav { display: flex; background: #5d4037; position: sticky; top: 0; z-index: 100; }
+#main-nav button { flex: 1; background: none; border: none; color: var(--kn-yellow); padding: 15px; font-weight: bold; }
 
-.team-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 20px;
-    padding: 20px;
-}
+.quest-card { background: white; margin: 15px; padding: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 5px solid var(--kn-red); }
+.task-area { text-align: left; background: #fdf6e3; padding: 15px; border-radius: 8px; margin-top: 10px; border: 1px inset #ddd; }
+.quiz-opt { display: block; background: white; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc; font-size: 0.9em; cursor: pointer; }
 
-.team-card {
-    background: #fffdf5;
-    border: 2px solid #5d4037;
-    border-radius: 15px;
-    padding: 20px;
-    transition: transform 0.2s;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
+.status-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #eee; border-bottom: 1px solid #ccc; }
+#user-team-display { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+#user-team-display img { width: 30px; height: 30px; }
 
-.team-card:active {
-    transform: scale(0.95);
-    background: #f5f1e0;
-}
+.primary-btn { background: var(--kn-red); color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; width: 100%; margin-top: 10px; }
+.submit-btn { background: #2e7d32; color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: bold; margin-top: 15px; }
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 200; }
+.modal-content { background: white; padding: 25px; border-radius: 15px; width: 80%; }
 
-.team-card img {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 10px;
-}
-
-.team-img {
-    width: 35px;
-    height: 35px;
-    vertical-align: middle;
-    margin-right: 10px;
-}
-.team-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    padding: 20px;
-}
-
-#user-team-display {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: bold;
-    font-size: 1.2em;
-}
-
-#user-team-display img {
-    width: 35px;
-    height: 35px;
-    object-fit: contain;
-}
-.back-btn {
-    background: #666;
-    color: white;
-    border: none;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 5px;
-}
-
-button {
-    background: var(--kn-red);
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    font-size: 1.1em;
-    border-radius: 8px;
-    margin: 10px;
-}
-
-#leaderboard-table {
-    width: 90%;
-    margin: 20px auto;
-    border-collapse: collapse;
-    background: #fffdf5; /* Paper/Parchment color */
-    border: 2px solid #5d4037;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-#leaderboard-table th {
-    background: #5d4037;
-    color: #F2D53C;
-    padding: 12px;
-    font-family: 'Cinzel', serif;
-}
-
-#leaderboard-table td {
-    padding: 15px;
-    border-bottom: 1px solid #d7ccc8;
-    font-size: 1.1em;
-}
-
-#leaderboard-table tr:nth-child(even) {
-    background-color: #efebe9;
-}
-
-.section-title {
-    font-family: 'Cinzel', serif;
-    color: #C80E13;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-}
-
-/* Specific styling for the new team icons */
-.team-card[onclick*="Lotus"] {
-    border-bottom: 5px solid #ff80ab; /* Pink for Lotus */
-}
-
-
-/* Modal styling for better mobile focus */
-.modal {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85); /* Dim background */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background: var(--hampi-sand);
-    padding: 30px;
-    border-radius: 20px;
-    border: 3px solid var(--kn-yellow);
-    width: 80%;
-}
-
-
-
+#leaderboard-table { width: 90%; margin: 20px auto; border-collapse: collapse; background: white; }
+#leaderboard-table th { background: #5d4037; color: white; padding: 10px; }
+#leaderboard-table td { padding: 10px; border-bottom: 1px solid #ddd; }
