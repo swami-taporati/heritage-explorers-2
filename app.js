@@ -85,15 +85,21 @@ function renderQuests() {
     const cont = document.getElementById('quest-container');
     if(!cont) return;
     cont.innerHTML = "";
+    
     if (challenges.length === 0) {
         cont.innerHTML = "<p style='text-align:center; padding:20px;'>No challenges found. Please Sync.</p>";
         return;
     }
-    const sites = [...new Set(challenges.map(c => c.Site))];
+
+    // FILTER: Only include challenges where SiteCode is present and not empty
+    const validChallenges = challenges.filter(c => c.SiteCode && c.SiteCode.toString().trim() !== "");
+    const sites = [...new Set(validChallenges.map(c => c.Site))];
+
     sites.forEach(site => {
         const isUnlocked = localStorage.getItem(`unlock_${site}`) === "true";
         const card = document.createElement('div');
         card.className = "quest-card";
+
         if (!isUnlocked) {
             card.innerHTML = `
                 <h3 style="color: #777;">🔒 ${site}</h3>
@@ -107,7 +113,9 @@ function renderQuests() {
                     <button onclick="goBack()" class="back-link">Back</button>
                 </div>
             `;
-            challenges.filter(c => c.Site === site).forEach(t => card.appendChild(createTaskUI(t)));
+            validChallenges.filter(c => c.Site === site).forEach(t => {
+                card.appendChild(createTaskUI(t));
+            });
         }
         cont.appendChild(card);
     });
@@ -180,7 +188,25 @@ async function sendSubmission(payload) {
 function submitQuiz(id, site, idx) {
     const t = challenges.find(x => x.TaskID === id);
     const isCorrect = (idx == t.CorrectAns);
-    sendSubmission({ team: userTeam, site: site, taskId: id, type: 'quiz', content: `Idx: ${idx}`, autoPts: isCorrect ? parseInt(t.Points) : 0 });
+    
+    // UI Feedback: Highlight the selected button
+    const taskElement = document.querySelector(`[onclick*="${id}"]`).parentElement;
+    const buttons = taskElement.querySelectorAll('.quiz-opt');
+    
+    // Remove previous selections and highlight current
+    buttons.forEach(btn => btn.style.border = "1px solid #ddd");
+    event.target.style.background = isCorrect ? "#27ae60" : "#e74c3c";
+    event.target.style.color = "white";
+
+    sendSubmission({ 
+        team: userTeam, 
+        site: site, 
+        taskId: id, 
+        type: 'quiz', 
+        content: `Idx: ${idx}`, 
+        autoPts: isCorrect ? parseInt(t.Points) : 0 
+    });
+
     alert(isCorrect ? "🌟 Correct!" : "❌ Incorrect.");
 }
 
