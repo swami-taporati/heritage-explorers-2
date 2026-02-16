@@ -1,13 +1,18 @@
 {
-  "name": "Heritage Explorers II: Karnataka",
-  "short_name": "HeritageExp2",
+  "name": "Heritage Engine 2026",
+  "short_name": "Heritage26",
   "description": "Educational scavenger hunt for the Karnataka heritage trip 2026.",
-  "start_url": "index.html",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#E1B382",
-  "theme_color": "#C80E13",
+  "background_color": "#2c3e50",
+  "theme_color": "#f39c12",
   "orientation": "portrait",
   "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/821/821313.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
     {
       "src": "https://cdn-icons-png.flaticon.com/512/821/821313.png",
       "type": "image/png",
