@@ -9,42 +9,43 @@
 </head>
 <body>
     <header>
-        <h1 id="site-title">HERITAGE ENGINE</h1>
+        <h1 id="site-title">HERITAGE EXPLORERS</h1>
         <div id="score-display" style="display:none;">Pts: <span id="my-pts">0</span></div>
     </header>
 
-    <div id="app">
+    <main id="app">
         <section id="login-view">
+            <h2 class="section-title">Select Team</h2>
             <div class="team-grid" id="team-selector"></div>
-            <button class="admin-access" onclick="openAdmin()">Teacher Login</button>
+            <button class="admin-access-btn" onclick="openAdmin()">🔑 Teacher HQ</button>
         </section>
 
         <section id="main-view" style="display:none;">
+            <div class="team-banner" id="active-team-banner"></div>
             <div id="quest-container"></div>
             <button class="sync-btn" onclick="syncData()">🔄 Sync Challenges</button>
+            <button class="logout-link" onclick="logout()">Logout Team</button>
         </section>
 
-      <section id="admin-view" style="display:none;">
-    <div class="admin-header">
-        <h2>Teacher HQ</h2>
-        <button class="danger-btn" onclick="resetGameForUser()">⚠️ Reset This Device</button>
-    </div>
-    
-    <div class="sync-section">
-        <button class="primary-btn" onclick="loadPendingReviews()">Refresh Pending Tasks</button>
-    </div>
+        <section id="admin-view" style="display:none;">
+            <h2 class="section-title">Teacher Review HQ</h2>
+            <div class="admin-tools">
+                <button class="danger-btn" onclick="resetGameForUser()">⚠️ Reset This Device</button>
+                <button class="primary-btn" onclick="loadPendingReviews()">Refresh Submissions</button>
+            </div>
+            <div id="pending-list"></div>
+            <button class="secondary-btn" onclick="location.reload()">Back to Home</button>
+        </section>
+    </main>
 
-    <div id="pending-list">
-        </div>
-
-    <button class="secondary-btn" onclick="location.reload()">Exit Admin</button>
-</section>
     <div id="pin-modal" class="modal" style="display:none;">
         <div class="modal-content">
             <h3 id="target-team"></h3>
-            <input type="password" id="pin-input" maxlength="4" placeholder="Enter PIN">
-            <button onclick="checkLogin()">Enter</button>
-            <button onclick="closeModal()">Back</button>
+            <input type="tel" id="pin-input" maxlength="4" placeholder="4-Digit PIN">
+            <div class="modal-btns">
+                <button class="primary-btn" onclick="checkLogin()">Enter</button>
+                <button class="secondary-btn" onclick="closeModal()">Cancel</button>
+            </div>
         </div>
     </div>
 
