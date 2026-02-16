@@ -1,4 +1,6 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyH0ey1aVqAx2byXwg8IByOnOJUu-nJOBFGH6YXoQqNRRoAAdVswp7Rs0SbPIg7tzq9Sg/exec";
+const SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
+
 const TEAMS = {
     "Indian Roller": { pin: "4921" },
     "Asian Elephant": { pin: "8374" },
@@ -10,36 +12,37 @@ const TEAMS = {
 let userTeam = localStorage.getItem('team');
 let challenges = JSON.parse(localStorage.getItem('challenges') || "[]");
 let selectedTeamTemp = "";
-let currentCluesUsed = {}; 
+let currentCluesUsed = {};
 
 window.onload = () => {
     initTeams();
     if (userTeam) {
         showView('main-view');
-        // ADD THIS LINE:
-        document.getElementById('active-team-banner').innerText = `Team: ${userTeam}`;
+        const banner = document.getElementById('active-team-banner');
+        if(banner) banner.innerText = `Team: ${userTeam}`;
         renderQuests();
-        updateScoreDisplay(); // Added to fix point 3
+        updateScoreDisplay();
+    } else {
+        showView('selection-view');
     }
 };
 
-// --- NAVIGATION & UI ---
 function showView(id) {
     document.querySelectorAll('section').forEach(s => s.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
-    if(id === 'main-view') document.getElementById('score-display').style.display = 'block';
+    const target = document.getElementById(id);
+    if(target) target.style.display = 'block';
 }
 
 function initTeams() {
     const grid = document.getElementById('team-selector');
+    if (!grid) return;
     grid.innerHTML = "";
     Object.keys(TEAMS).forEach(t => {
         const btn = document.createElement('div');
         btn.className = "team-btn";
-        // ADD THIS INNER HTML:
         btn.innerHTML = `
             <img src="icons/${t}.png" class="team-icon" onerror="this.src='icons/default.png'">
-            <div>${t}</div>
+            <div class="team-label">${t}</div>
         `;
         btn.onclick = () => openPin(t);
         grid.appendChild(btn);
@@ -63,21 +66,28 @@ function checkLogin() {
     } else { alert("Wrong PIN!"); }
 }
 
-function logout() { localStorage.removeItem('team'); location.reload(); }
+async function updateScoreDisplay() {
+    if(!userTeam) return;
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=getScore&team=${userTeam}`);
+        const total = await res.text();
+        document.getElementById('my-pts').innerText = total;
+    } catch (e) { console.log("Score update failed"); }
+}
 
-// --- DATA ENGINE ---
 async function syncData() {
     try {
         const res = await fetch(`${SCRIPT_URL}?action=sync`);
         challenges = await res.json();
         localStorage.setItem('challenges', JSON.stringify(challenges));
         renderQuests();
-        alert("✅ Trip Data Updated!");
-    } catch (e) { alert("📡 Connection error. Try again when you have signal."); }
+        alert("✅ Sync Complete!");
+    } catch (e) { alert("📡 Sync failed. Check internet."); }
 }
 
 function renderQuests() {
     const cont = document.getElementById('quest-container');
+    if(!cont) return;
     cont.innerHTML = "";
     const sites = [...new Set(challenges.map(c => c.Site))];
 
@@ -85,15 +95,12 @@ function renderQuests() {
         const isUnlocked = localStorage.getItem(`unlock_${site}`);
         const card = document.createElement('div');
         card.className = "quest-card";
-         if (site === "Grand Finale") {
-         card.style.borderLeft = "6px solid #FFD700"; // Gold border for the finale
-         card.style.background = "#fffdf0";
-                       }
+        if (site === "Grand Finale") card.classList.add('finale-card');
         
         if (!isUnlocked) {
             card.innerHTML = `<h3>${site}</h3>
-                <input type="text" id="code-${site}" class="quiz-opt" placeholder="Enter Unlock Code">
-                <button class="submit-btn" onclick="unlockSite('${site}')">Unlock Location</button>`;
+                <input type="text" id="code-${site}" class="quiz-opt" placeholder="Unlock Code">
+                <button class="submit-btn" onclick="unlockSite('${site}')">Unlock</button>`;
         } else {
             card.innerHTML = `<h3>${site}</h3>`;
             challenges.filter(c => c.Site === site).forEach(t => {
@@ -110,7 +117,7 @@ function createTaskUI(t) {
     div.className = `task-item ${isDone ? 'locked-task' : ''}`;
     
     if (isDone) {
-        div.innerHTML = `<p>✅ <strong>Task Locked:</strong> ${t.Question}</p>`;
+        div.innerHTML = `<p>✅ <strong>Completed:</strong> ${t.Question}</p>`;
         return div;
     }
 
@@ -119,40 +126,31 @@ function createTaskUI(t) {
     if (t.Type === 'quiz') {
         const opts = t.Options_Clues.split(",");
         html += opts.map((o,i) => `<button class="quiz-opt" onclick="submitQuiz('${t.TaskID}','${t.Site}',${i})">${o}</button>`).join("");
-    } 
-    else if (t.Type === 'clue') {
+    } else if (t.Type === 'clue') {
         const clues = t.Options_Clues.split("|");
         html += `<p id="clue-text-${t.TaskID}" class="clue-display">Clue 1: ${clues[0]}</p>
-                 <button class="clue-btn" onclick="nextClue('${t.TaskID}','${t.Options_Clues}')">Need another clue?</button>
-                 <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Answer">
-                 <button class="submit-btn" onclick="submitClue('${t.TaskID}','${t.Site}')">Submit Solve</button>`;
-    } 
-    else if (t.Type === 'media') {
-        html += `<label class="upload-label"><input type="checkbox" id="check-${t.TaskID}"> I have uploaded to Drive</label>
-                 <button class="submit-btn" onclick="submitMedia('${t.TaskID}','${t.Site}')">Confirm Submission</button>`;
-    } 
-    else if (t.Type === 'word') {
-        html += `<div id="log-${t.TaskID}" class="puzzle-log">Goal: ${t.CorrectAns.length} letters</div>
-                 <input type="text" id="word-in-${t.TaskID}" class="quiz-opt" placeholder="Guess word">
-                 <button class="submit-btn" onclick="submitWordGuess('${t.TaskID}','${t.CorrectAns}','${t.Site}')">Check Cow/Bull</button>`;
-    }
-    else if (t.Type === 'short') {
-        html += `<textarea id="text-${t.TaskID}" class="quiz-opt" placeholder="Type your answer here..."></textarea>
-                 <button class="submit-btn" onclick="submitShort('${t.TaskID}','${t.Site}')">Submit Answer</button>`;
+                 <button class="clue-btn" onclick="nextClue('${t.TaskID}','${t.Options_Clues}')">Next Clue (-5 pts)</button>
+                 <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Answer...">
+                 <button class="submit-btn" onclick="submitClue('${t.TaskID}','${t.Site}')">Submit</button>`;
+    } else if (t.Type === 'word') {
+        html += `<div id="log-${t.TaskID}" class="puzzle-log">Target: ${t.CorrectAns.length} letters</div>
+                 <input type="text" id="word-in-${t.TaskID}" class="quiz-opt" placeholder="Guess">
+                 <button class="submit-btn" onclick="submitWordGuess('${t.TaskID}','${t.CorrectAns}','${t.Site}')">Check</button>`;
+    } else {
+        html += `<button class="submit-btn" onclick="submitManual('${t.TaskID}','${t.Site}','${t.Type}')">I've completed this!</button>`;
     }
 
     div.innerHTML = html;
     return div;
 }
 
-// --- LOGIC FUNCTIONS ---
 function unlockSite(site) {
     const val = document.getElementById(`code-${site}`).value.toUpperCase();
     const correct = challenges.find(c => c.Site === site).SiteCode.toString().toUpperCase();
     if (val === correct) {
         localStorage.setItem(`unlock_${site}`, "true");
         renderQuests();
-    } else { alert("❌ Incorrect Site Code!"); }
+    } else { alert("Wrong Code!"); }
 }
 
 async function sendSubmission(payload) {
@@ -160,15 +158,16 @@ async function sendSubmission(payload) {
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
         localStorage.setItem(`done_${payload.taskId}`, "true");
         renderQuests();
-    } catch (e) { alert("Failed to save. Try again."); }
+        setTimeout(updateScoreDisplay, 2000);
+    } catch (e) { alert("Submit failed."); }
 }
 
-function submitQuiz(id, site, userIndex) {
-    const t = challenges.find(task => task.TaskID === id);
-    const isCorrect = (userIndex == t.CorrectAns);
-    const finalPts = isCorrect ? parseInt(t.Points) : 0;
-    if(isCorrect) alert("🎯 Correct!"); else alert("❌ Incorrect.");
-    sendSubmission({ team: userTeam, site: site, taskId: id, type: 'quiz', content: `Index: ${userIndex}`, autoPts: finalPts });
+function submitQuiz(id, site, idx) {
+    const t = challenges.find(x => x.TaskID === id);
+    const isCorrect = (idx == t.CorrectAns);
+    const pts = isCorrect ? parseInt(t.Points) : 0;
+    if(isCorrect) alert("Correct!"); else alert("Incorrect.");
+    sendSubmission({ team: userTeam, site: site, taskId: id, type: 'quiz', content: `Choice ${idx}`, autoPts: pts });
 }
 
 function nextClue(id, cluesStr) {
@@ -178,99 +177,46 @@ function nextClue(id, cluesStr) {
         currentCluesUsed[id]++;
         document.getElementById(`clue-text-${id}`).innerText = "Clue " + currentCluesUsed[id] + ": " + clues[currentCluesUsed[id]-1];
         localStorage.setItem(`clue_count_${id}`, currentCluesUsed[id]);
-    } else { alert("No more clues left!"); }
+    }
 }
 
 function submitClue(id, site) {
-    const t = challenges.find(task => task.TaskID === id);
-    const userAns = document.getElementById(`in-${id}`).value.toUpperCase().trim();
-    // Use t.CorrectAns directly:
-    const correctAns = t.CorrectAns.toString().toUpperCase().trim();
-    
-    if (userAns === correctAns) {
-        const count = parseInt(localStorage.getItem(`clue_count_${id}`) || 1);
-        let pts = parseInt(t.Points) - ((count - 1) * 5);
-        if (pts < 5) pts = 5;
-        alert(`🎉 Correct! +${pts} Pts`);
-        sendSubmission({ team: userTeam, site: site, taskId: id, type: 'clue', content: userAns, autoPts: pts });
-    } else { alert("❌ Wrong answer!"); }
+    const t = challenges.find(x => x.TaskID === id);
+    const ans = document.getElementById(`in-${id}`).value.toUpperCase().trim();
+    if (ans === t.CorrectAns.toString().toUpperCase().trim()) {
+        const used = parseInt(localStorage.getItem(`clue_count_${id}`) || 1);
+        let pts = parseInt(t.Points) - ((used - 1) * 5);
+        sendSubmission({ team: userTeam, site: site, taskId: id, type: 'clue', content: ans, autoPts: Math.max(pts, 5) });
+        alert("Correct!");
+    } else { alert("Try again!"); }
 }
 
 function submitWordGuess(id, target, site) {
-    const t = challenges.find(task => task.TaskID === id);
     const guess = document.getElementById(`word-in-${id}`).value.toUpperCase();
-    if (guess.length !== target.length) return alert("Wrong length!");
-    let b = 0, c = 0;
-    let tArr = target.split(""), gArr = guess.split("");
-    for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]) { b++; tArr[i]=null; gArr[i]=null; }
-    for(let i=0; i<gArr.length; i++) if(gArr[i] && tArr.includes(gArr[i])) { c++; tArr[tArr.indexOf(gArr[i])]=null; }
+    if (guess.length !== target.length) return alert("Wrong length");
+    let b=0, c=0;
+    let tArr=target.toUpperCase().split(""), gArr=guess.split("");
+    for(let i=0;i<tArr.length;i++) if(gArr[i]===tArr[i]){b++; tArr[i]=null; gArr[i]=null;}
+    for(let i=0;i<gArr.length;i++) if(gArr[i] && tArr.includes(gArr[i])){c++; tArr[tArr.indexOf(gArr[i])]=null;}
     document.getElementById(`log-${id}`).innerHTML += `<div>${guess}: ${b}B ${c}C</div>`;
-    if (b === target.length) {
-        alert("🎊 WORD DISCOVERED!");
+    if(b === target.length) {
+        const t = challenges.find(x => x.TaskID === id);
         sendSubmission({ team: userTeam, site: site, taskId: id, type: 'word', content: guess, autoPts: t.Points });
+        alert("Success!");
     }
 }
 
-function submitMedia(id, site) {
-    if(!document.getElementById(`check-${id}`).checked) return alert("Please check the box first!");
-    sendSubmission({ team: userTeam, site: site, taskId: id, type: 'media', content: "Media Uploaded", autoPts: 0 });
+function submitManual(id, site, type) {
+    sendSubmission({ team: userTeam, site: site, taskId: id, type: type, content: "Submitted", autoPts: 0 });
+    alert("Sent to teacher for review!");
 }
 
-function submitShort(id, site) {
-    const val = document.getElementById(`text-${id}`).value;
-    if(!val) return alert("Answer cannot be empty!");
-    sendSubmission({ team: userTeam, site: site, taskId: id, type: 'short', content: val, autoPts: 0 });
-}
+function logout() { localStorage.removeItem('team'); location.reload(); }
 
-// --- TEACHER ADMIN ---
 function openAdmin() {
-    if (prompt("Teacher HQ Passcode:") === "KARNATAKA2026") {
-        showView('admin-view');
-        loadPendingReviews();
-    }
-}
-
-async function loadPendingReviews() {
-    const list = document.getElementById('pending-list');
-    list.innerHTML = "Fetching pending tasks...";
-    try {
-        const res = await fetch(`${SCRIPT_URL}?action=getPending`);
-        const tasks = await res.json();
-        list.innerHTML = tasks.map(t => `
-            <div class="task-item">
-                <strong>Team ${t.team}</strong> (${t.loc})<br>
-                <em>${t.type}: ${t.content}</em><br>
-                <div style="display:flex; gap:10px; margin-top:10px;">
-                    <input type="number" id="pts-${t.row}" placeholder="Points" style="width:70px">
-                    <button class="primary-btn" onclick="gradeTask(${t.row})">Award</button>
-                </div>
-            </div>
-        `).join('') || "All submissions graded!";
-    } catch (e) { list.innerHTML = "Error loading submissions."; }
-}
-
-async function gradeTask(rowId) {
-    const pts = document.getElementById(`pts-${rowId}`).value;
-    if(!pts) return alert("Enter points!");
-    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'grade', row: rowId, pts: pts }) });
-    alert("Points Assigned.");
-    loadPendingReviews();
-}
-
-sync function updateScoreDisplay() {
-    try {
-        const res = await fetch(`${SCRIPT_URL}?action=getScore&team=${userTeam}`);
-        const total = await res.text();
-        document.getElementById('my-pts').innerText = total;
-    } catch (e) { console.log("Score sync failed"); }
-}
-
-// Update your sendSubmission function to call this after a success:
-async function sendSubmission(payload) {
-    // ... (existing code)
-    await updateScoreDisplay(); // Refresh points after answering
+    if (prompt("Admin Pass:") === "KARNATAKA2026") showView('admin-view');
 }
 
 function resetGameForUser() {
-    if(confirm("⚠️ WIPE PROGRESS ON THIS DEVICE?")) { localStorage.clear(); location.reload(); }
+    if(confirm("WIPE DATA?")) { localStorage.clear(); location.reload(); }
 }
