@@ -1,18 +1,28 @@
-const CACHE_NAME = 'heritage-v4-cache'; // Incremented version
+const CACHE_NAME = 'heritage-v5-cache'; 
 const urlsToCache = [
   './',
   './index.html',
   './style.css',
   './app.js',
-  // Updated to match the Cinzel and Fauna One fonts used in your HTML
+  './manifest.json',
+  // Local Team Icons
+  './images/Indian Roller.png',
+  './images/Asian Elephant.png',
+  './images/Lotus.png',
+  './images/Sandalwood.png',
+  './images/Mango.png',
+  // Fonts
   'https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Fauna+One&display=swap'
 ];
 
 // Install Service Worker
 self.addEventListener('install', event => {
-  self.skipWaiting(); // Forces the new service worker to take over immediately
+  self.skipWaiting(); 
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('SW: Pre-caching assets');
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
@@ -23,7 +33,7 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cache => {
           if (cache !== CACHE_NAME) {
-            console.log('Service Worker: Clearing Old Cache');
+            console.log('SW: Clearing Old Cache:', cache);
             return caches.delete(cache);
           }
         })
@@ -32,9 +42,12 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Network falling back to Cache
+// Network-First Strategy (Try network, then cache)
+// This ensures they get live Leaderboard scores if online, but the app works if offline.
 self.addEventListener('fetch', event => {
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
+    })
   );
 });
