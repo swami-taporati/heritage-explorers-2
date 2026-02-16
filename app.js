@@ -73,19 +73,29 @@ async function syncData() {
 function renderQuests() {
     const cont = document.getElementById('quest-container');
     cont.innerHTML = "";
+    
+    // Group challenges by site
     const sites = [...new Set(challenges.map(c => c.Site))];
 
     sites.forEach(site => {
-        const isUnlocked = localStorage.getItem(`unlock_${site}`);
+        const isUnlocked = localStorage.getItem(`unlock_${site}`) === "true";
         const card = document.createElement('div');
         card.className = "quest-card";
+
         if (!isUnlocked) {
-            card.innerHTML = `<h3>${site}</h3>
+            // ONLY show the unlock box if not unlocked
+            card.innerHTML = `
+                <h3 style="color: #777;">🔒 ${site} (Locked)</h3>
+                <p style="font-size: 0.8em;">Enter the code found at this location to begin.</p>
                 <input type="text" id="code-${site}" class="quiz-opt" placeholder="Unlock Code">
-                <button class="submit-btn" onclick="unlockSite('${site}')">Unlock</button>`;
+                <button class="submit-btn" onclick="unlockSite('${site}')">Unlock Site</button>
+            `;
         } else {
-            card.innerHTML = `<h3>${site}</h3>`;
-            challenges.filter(c => c.Site === site).forEach(t => card.appendChild(createTaskUI(t)));
+            // Show the tasks only if unlocked
+            card.innerHTML = `<h3>📍 ${site}</h3>`;
+            challenges.filter(c => c.Site === site).forEach(t => {
+                card.appendChild(createTaskUI(t));
+            });
         }
         cont.appendChild(card);
     });
