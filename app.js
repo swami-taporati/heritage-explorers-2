@@ -276,7 +276,18 @@ async function triggerFinalReveal() {
 }
 
 function logout() { localStorage.removeItem('team'); location.reload(); }
-function openAdmin() { if (prompt("Pass:") === "KARNATAKA2026") { showView('admin-view'); renderPending(); } }
+function openAdmin() {
+    const pass = prompt("Enter Teacher HQ Password:");
+    if (pass === null) return; // User clicked cancel
+
+    if (pass === "KARNATAKA2026") {
+        showView('admin-view');
+        renderPending();
+        updateAdminLeaderboard(); // Load standings into HQ
+    } else {
+        alert("❌ Access Denied: Incorrect Password");
+    }
+}
 
 async function renderPending() {
     const list = document.getElementById('pending-list');
@@ -305,6 +316,27 @@ async function renderPending() {
     }
 }
 
+// Function to specifically update the leaderboard inside Teacher HQ
+async function updateAdminLeaderboard() {
+    const container = document.getElementById('admin-leaderboard-container');
+    if(!container) return;
+    
+    container.innerHTML = "⏳ Loading standings...";
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=getLeaderboard`);
+        const data = await res.json();
+        data.sort((a, b) => b.score - a.score);
+        
+        container.innerHTML = data.map((item, index) => `
+            <div style="display:flex; justify-content:space-between; padding: 5px 0; border-bottom: 1px solid #eee;">
+                <span>${index + 1}. ${item.team}</span>
+                <strong>${item.score} pts</strong>
+            </div>
+        `).join("");
+    } catch (e) {
+        container.innerHTML = "⚠️ Error loading scores.";
+    }
+}
 async function approveTask(row) {
     const pts = document.getElementById(`p-${row}`).value;
     const btn = document.getElementById(`btn-${row}`);
