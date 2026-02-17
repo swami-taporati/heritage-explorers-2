@@ -6,11 +6,12 @@ const urlsToCache = [
   './app.js',
   './manifest.json',
   // Local Team Icons
-  './images/Indian Roller.png',
-  './images/Asian Elephant.png',
-  './images/Lotus.png',
-  './images/Sandalwood.png',
-  './images/Mango.png',
+'./images/Gaja.png',
+  './images/Neelakanta.png',
+  './images/Kamala.png',
+  './images/Srigandha.png',
+  './images/Mavina.png',
+  './images/Chitte.png',
   // Fonts
   'https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Fauna+One&display=swap'
 ];
