@@ -1,11 +1,11 @@
 {
-  "name": "Heritage Engine 2026",
-  "short_name": "Heritage26",
+  "name": "Heritage Explorer",
+  "short_name": "Explorer",
   "description": "Educational scavenger hunt for the Karnataka heritage trip 2026.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#2c3e50",
-  "theme_color": "#f39c12",
+  "background_color": "#ffffff",
+  "theme_color": "#2c3e50"
   "orientation": "portrait",
   "icons": [
     {
