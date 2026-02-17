@@ -261,13 +261,20 @@ async function updateScoreDisplay() {
 
 async function updateLeaderboard() {
     const container = document.getElementById('leaderboard-container');
-    if(!container) return;
     try {
         const res = await fetch(`${SCRIPT_URL}?action=getLeaderboard`);
         const data = await res.json();
-        data.sort((a, b) => b.score - a.score);
-        container.innerHTML = data.map((item, index) => `<div class="score-row"><span>${index + 1}. ${item.team}</span><span><strong>${item.score}</strong></span></div>`).join("");
-    } catch (e) { container.innerHTML = "<p>Offline</p>"; }
+        
+        // item.team and item.score must match the keys in Code.gs
+        container.innerHTML = data.map((item, index) => `
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <span>${index + 1}. ${item.team}</span>
+                <strong>${item.score} pts</strong>
+            </div>
+        `).join('');
+    } catch (e) {
+        container.innerHTML = "Leaderboard currently unavailable";
+    }
 }
 
 async function triggerFinalReveal() {
