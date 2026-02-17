@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heritage Engine 2026</title>
+    <title>Heritage Explorer 2026</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Fauna+One&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
@@ -12,11 +12,14 @@
 
     <section id="selection-view">
         <div class="header-box">
-            <h1>Heritage Engine</h1>
+            <h1>Heritage Explorer</h1>
             <p>Select your team</p>
         </div>
         <div id="team-selector" class="team-grid"></div>
-        <button class="admin-btn" onclick="openAdmin()">🔑 Teacher HQ</button>
+        
+        <div style="text-align: center; margin-top: 40px;">
+            <button class="admin-btn" onclick="openAdmin()" style="background:none; border:none; color:#999; text-decoration:underline; font-size:0.8em;">🔑 Teacher HQ</button>
+        </div>
     </section>
 
     <section id="main-view" style="display:none">
@@ -46,42 +49,38 @@
         </div>
     </section>
 
-  <section id="admin-view" style="display:none">
-    <div class="header-box">
-        <h2>Teacher HQ</h2>
-        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px;">
-            <button onclick="showView('selection-view')" class="back-btn">← Back</button>
-            <button onclick="logout()" class="back-btn" style="border-color: #e74c3c; color: #e74c3c;">🚪 Logout</button>
+    <section id="admin-view" style="display:none">
+        <div class="header-box">
+            <h2>Teacher HQ</h2>
+            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px;">
+                <button onclick="showView('selection-view')" class="back-btn">← Back</button>
+                <button onclick="logout()" class="back-btn" style="border-color: #e74c3c; color: #e74c3c;">🚪 Logout</button>
+            </div>
         </div>
-    </div>
 
-    <div style="margin: 15px; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3 style="margin:0; font-size: 0.9em; color: var(--primary);">📊 Current Standings</h3>
-            <button onclick="updateAdminLeaderboard()" style="background:none; border:none; color:blue; font-size:0.8em; cursor:pointer;">🔄 Refresh</button>
+        <div style="margin: 15px; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin:0; font-size: 0.9em; color: var(--primary);">📊 Current Standings</h3>
+                <button onclick="updateAdminLeaderboard()" style="background:none; border:none; color:blue; font-size:0.8em; cursor:pointer;">🔄 Refresh</button>
+            </div>
+            <div id="admin-leaderboard-container" style="font-size: 0.85em;"></div>
         </div>
-        <div id="admin-leaderboard-container" style="font-size: 0.85em;"></div>
-    </div>
-    
-    <div id="pending-list" class="admin-list"></div>
-    
-    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-    
-    <div style="padding: 10px; text-align: center;">
-        <br>
-        <button class="danger-btn" onclick="triggerGlobalReset()">🚨 Reset Global Sheet</button>
-    </div>
-</section>
+        
+        <div id="pending-list" class="admin-list"></div>
         
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
         
-        <div style="padding: 10px; text-align: center;">
-            <button class="primary-btn" style="background: gold; color: black; margin-bottom: 15px; font-weight: bold; width: 100%; padding: 15px; border-radius: 8px; border: none; cursor: pointer;" onclick="triggerFinalReveal()">
+        <div style="padding: 10px; text-align: center; display: flex; flex-direction: column; gap: 10px;">
+            <button class="primary-btn" style="background: gold; color: black; font-weight: bold; padding: 15px; border-radius: 8px; border: none; cursor: pointer;" onclick="triggerFinalReveal()">
                 🏆 SHOW FINAL WINNER
             </button>
-            <br>
-            <button class="danger-btn" onclick="resetGameForUser()" style="background: #ff4444; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+            
+            <button class="danger-btn" onclick="resetGameForUser()" style="background: #95a5a6; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">
                 ⚠️ Reset This Device
+            </button>
+
+            <button class="danger-btn" onclick="triggerGlobalReset()" style="background: #ff4444; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">
+                🚨 Reset Global Sheet
             </button>
         </div>
     </section>
