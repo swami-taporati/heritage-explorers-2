@@ -13,6 +13,8 @@ let userTeam = localStorage.getItem('team');
 let challenges = JSON.parse(localStorage.getItem('challenges') || "[]");
 let selectedTeamTemp = "";
 
+const APP_TITLE = "Heritage Explorer";
+
 window.onload = () => {
     initTeams();
     if (userTeam) {
@@ -22,6 +24,9 @@ window.onload = () => {
         renderQuests();
         updateScoreDisplay();
         updateLeaderboard();
+        
+        // Hide the winner overlay just in case it was left open
+        document.getElementById('winner-overlay').style.display = 'none';
     }
 };
 
