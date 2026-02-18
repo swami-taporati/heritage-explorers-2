@@ -272,7 +272,7 @@ function submitClue(id, site) {
             count++;
             localStorage.setItem(`clue_count_${id}`, count);
             renderQuests();
-            alert("Incorrect: Next clue has been revealed");
+            alert("Incorrect: Next clue will be revealed");
         } else {
             alert("Incorrect: Try again");
         }        
