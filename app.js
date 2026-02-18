@@ -159,6 +159,18 @@ function createTaskUI(t) {
     } 
     else if (t.Type === 'clue') {
         const clues = t.Options_Clues.split("|");
+        let count = parseInt(localStorage.getItem(`clue_count_${t.TaskID}`) || 1);
+        for(let i=0; i<clues.length; i++) {
+            if( i < count ) {
+                html += `
+                    <p id="clue-text-${t.TaskID}-${i}" class="clue-display">Clue ${i+1}: ${clues[i]}</p>
+                `;
+            } else {
+                html += `
+                    <p hidden id="clue-text-${t.TaskID}-${i}" class="clue-display">Clue ${i+1}: ${clues[i]}</p>
+                `;
+            }
+        }
         html += `
             <p id="clue-text-${t.TaskID}" class="clue-display">Clue 1: ${clues[0]}</p>
             <button class="clue-btn" onclick="nextClue('${t.TaskID}','${t.Options_Clues}')">Next Clue (-5 pts)</button>
@@ -229,7 +241,8 @@ function nextClue(id, cluesStr) {
     if (count < clues.length) {
         count++;
         localStorage.setItem(`clue_count_${id}`, count);
-        document.getElementById(`clue-text-${id}`).innerText = `Clue ${count}: ${clues[count - 1]}`;
+        //document.getElementById(`clue-text-${id}`).innerText = `Clue ${count}: ${clues[count - 1]}`;
+        renderQuests();
     }
 }
 
