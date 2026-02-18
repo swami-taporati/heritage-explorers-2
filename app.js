@@ -91,6 +91,7 @@ async function handleSubmittedTasks() {
             return;
         }
         data.forEach (entry => {
+            alert(entry.taskId);
             localStorage.setItem(`done_${entry.taskId}`, "true");
         });
     } catch(e) {}
