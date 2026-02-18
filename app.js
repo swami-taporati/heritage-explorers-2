@@ -171,8 +171,16 @@ function createTaskUI(t) {
                 `;
             }
         }
+        if(count < clues.length) {
+            html += `
+                <button class="clue-btn" onclick="nextClue('${t.TaskID}','${t.Options_Clues}')">Next Clue (-5 pts)</button>
+                `;
+        } else {
+            html += `
+                <button disabled="true" class="clue-btn")">No More Clues</button>
+                `;
+        }
         html += `
-            <button class="clue-btn" onclick="nextClue('${t.TaskID}','${t.Options_Clues}')">Next Clue (-5 pts)</button>
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Answer...">
             <button class="submit-btn" onclick="submitClue('${t.TaskID}','${t.Site}')">Submit</button>
         `;
@@ -240,7 +248,6 @@ function nextClue(id, cluesStr) {
     if (count < clues.length) {
         count++;
         localStorage.setItem(`clue_count_${id}`, count);
-        //document.getElementById(`clue-text-${id}`).innerText = `Clue ${count}: ${clues[count - 1]}`;
         renderQuests();
     }
 }
@@ -253,7 +260,12 @@ function submitClue(id, site) {
         let finalPts = Math.max(parseInt(t.Points) - ((count - 1) * 5), 5);
         sendSubmission({ team: userTeam, site: site, taskId: id, type: 'clue', content: ans, autoPts: finalPts });
         alert(`Correct! Points: ${finalPts}`);
-    } else { alert("Try again!"); }
+    } else { 
+        let count = parseInt(localStorage.getItem(`clue_count_${id}`) || 1);
+        count++;
+        localStorage.setItem(`clue_count_${id}`, count);
+        renderQuests();
+    }
 }
 
 function submitCowBull(id, target, site) {
