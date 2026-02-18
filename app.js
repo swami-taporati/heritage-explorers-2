@@ -147,7 +147,13 @@ function createTaskUI(t) {
         return div;
     }
 
-    let html = `<p><strong>${t.Type.toUpperCase()}:</strong> ${t.Question} (${t.Points} Pts)</p>`;
+    let points = t.Points;
+    if (t.Type === 'clue') {
+        let count = parseInt(localStorage.getItem(`clue_count_${t.TaskID}`) || 1);
+        points -= ((count - 1)*5);
+    }
+
+    let html = `<p><strong>${t.Type.toUpperCase()}:</strong> ${t.Question} (${points} Pts)</p>`;
     
     if (t.Type === 'quiz') {
         const opts = t.Options_Clues.split(",");
