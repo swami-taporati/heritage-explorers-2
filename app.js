@@ -147,7 +147,7 @@ function createTaskUI(t) {
         return div;
     }
 
-    let html = `<p><strong>${t.Type.toUpperCase()}:</strong> ${t.Question} (${t.Points})</p>`;
+    let html = `<p><strong>${t.Type.toUpperCase()}:</strong> ${t.Question} (${t.Points} Pts)</p>`;
     
     if (t.Type === 'quiz') {
         const opts = t.Options_Clues.split(",");
