@@ -75,12 +75,26 @@ async function syncData() {
         const res = await fetch(`${SCRIPT_URL}?action=sync`);
         challenges = await res.json();
         localStorage.setItem('challenges', JSON.stringify(challenges));
+        await handleSubmittedTasks();
         renderQuests();
         if(btn) btn.innerText = "✅ Sync Done";
     } catch (e) { alert("Sync failed"); }
     setTimeout(() => { if(btn) btn.innerText = "🔄 Sync Challenges"; }, 2000);
 }
 
+async function handleSubmittedTasks() {
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=getSubmittedTasks&team=${userTeam}`);
+        const data = await res.json();
+
+        if (data.length === 0) {
+            return;
+        }
+        data.forEach (entry => {
+            localStorage.setItem(`done_${payload.taskId}`, "true");
+        });
+    } catch(e) {}
+}
 
 function renderQuests() {
     const cont = document.getElementById('quest-container');
