@@ -172,7 +172,6 @@ function createTaskUI(t) {
             }
         }
         html += `
-            <p id="clue-text-${t.TaskID}" class="clue-display">Clue 1: ${clues[0]}</p>
             <button class="clue-btn" onclick="nextClue('${t.TaskID}','${t.Options_Clues}')">Next Clue (-5 pts)</button>
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Answer...">
             <button class="submit-btn" onclick="submitClue('${t.TaskID}','${t.Site}')">Submit</button>
