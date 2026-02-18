@@ -1,4 +1,4 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyH0ey1aVqAx2byXwg8IByOnOJUu-nJOBFGH6YXoQqNRRoAAdVswp7Rs0SbPIg7tzq9Sg/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwQ3pToy_PjP3v_2dmCCudwl4jtgfDiPPpnWS5O72KelxlHpBKCH9kkGPTgko_nqYQtkw/exec";
 
 const TEAMS = {
     "Neelakanta": { pin: "4921", folder: "https://drive.google.com/drive/folders/1Awv_3NvjvPhbnYXyZ-iELT3RA-SZdOBy?usp=drive_link" },
