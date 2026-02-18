@@ -143,7 +143,7 @@ function createTaskUI(t) {
     div.className = `task-item ${isDone ? 'locked-task' : ''}`;
     
     if (isDone) {
-        div.innerHTML = `<p>✅ <strong>Completed:</strong> ${t.Question}</p>`;
+        div.innerHTML = `<p>✅ <strong>Completed:</strong> ${t.Question} (${t.Points})</p>`;
         return div;
     }
 
