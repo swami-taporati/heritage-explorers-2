@@ -261,16 +261,21 @@ function nextClue(id, cluesStr) {
 function submitClue(id, site) {
     const t = challenges.find(x => x.TaskID === id);
     const ans = document.getElementById(`in-${id}`).value.toUpperCase().trim();
+    let count = parseInt(localStorage.getItem(`clue_count_${id}`) || 1);
     if (ans === t.CorrectAns.toString().toUpperCase().trim()) {
-        let count = parseInt(localStorage.getItem(`clue_count_${id}`) || 1);
         let finalPts = Math.max(parseInt(t.Points) - ((count - 1) * 5), 5);
         sendSubmission({ team: userTeam, site: site, taskId: id, type: 'clue', content: ans, autoPts: finalPts });
         alert(`Correct! Points: ${finalPts}`);
-    } else { 
-        let count = parseInt(localStorage.getItem(`clue_count_${id}`) || 1);
-        count++;
-        localStorage.setItem(`clue_count_${id}`, count);
-        renderQuests();
+    } else {
+        const clues = t.Options_Clues.split("|");
+        if (count < clues.length) {
+            count++;
+            localStorage.setItem(`clue_count_${id}`, count);
+            renderQuests();
+            alert("Incorrect: Next clue has been revealed");
+        } else {
+            alert("Incorrect: Try again");
+        }        
     }
 }
 
