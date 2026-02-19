@@ -225,9 +225,8 @@ function createTaskUI(t) {
             });
         }
         const cbContainerHTML = cbContainer.outerHTML;
-        //const ui = createWordleBoard(10, t.CorrectAns.length);
         html += `
-            <div id="log-${t.TaskID}" class="puzzle-log">Target: ${t.CorrectAns.length} letters</div>
+            <div id="log-${t.TaskID}" class="puzzle-log">Target: ${t.CorrectAns.length} letters  Maximum guesses allowed: ${t.CorrectAns.length}</div>
             ${cbContainerHTML}
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Guess...">
             <button class="submit-btn" onclick="submitCowBull('${t.TaskID}','${t.CorrectAns}','${t.Site}')">Check</button>
@@ -323,10 +322,21 @@ function submitCowBull(id, target, site) {
     let resultArr = [...Array(tArr.length)].fill('x');
     for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]) { b++; tArr[i]=null; gArr[i]=null; resultArr[i] = "b"}
     for(let i=0; i<gArr.length; i++) if(gArr[i] && tArr.indexOf(gArr[i])!==-1) { c++; tArr[tArr.indexOf(gArr[i])]=null; resultArr[i] = "c" }
-    //document.getElementById(`log-${id}`).innerHTML += `<div>${guess}: ${b}B, ${c}C : ${resultArr}</div>`;
+    
     document.getElementById(`CBContainer-${id}`).appendChild(createCBRow(origGuessArr, resultArr));
+
+    const pastGuesses = localStorage.getItem(`${id}_Guesses`);
+    let pastGuessCount = 0;
+    if (pastGuesses !== null) {
+        const pastGuessesArr = pastGuesses.split("|");
+        pastGuessCount = pastGuessesArr.length;
+        if( pastGuessCount >= target.length) {
+            alert ("Exceeded max allowed guesses");
+            return;
+        }
+    }
     if (b === target.length) {
-        sendSubmission({ team: userTeam, site: site, taskId: id, type: 'cowbull', content: guess, autoPts: 20 });
+        sendSubmission({ team: userTeam, site: site, taskId: id, type: 'cowbull', content: guess, autoPts: (target.length - pastGuessCount) * 5 });
         alert("🎉 Correct!");
     } else {
         let guesses = localStorage.getItem(`${id}_Guesses`);
