@@ -210,10 +210,24 @@ function createTaskUI(t) {
         `;
     } 
     else if (t.Type === 'cowbull') {
+        const cbContainer = document.createElement("div");
+        cbContainer.id = "CBContainer-" + t.TaskID;
+        const pastGuesses = localStorage.getItem(`${id}_Guesses`, "").split("|");
+        if(pastGuesses.length > 0) {
+            pastGuesses.forEach( guess => {                
+                let tArr = t.CorrectAns.toUpperCase().split(""), gArr = guess.split("");
+                let origGuessArr = guess.split("");
+                let resultArr = [...Array(tArr.length)].fill('x');
+                for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]) { b++; tArr[i]=null; gArr[i]=null; resultArr[i] = "b"}
+                for(let i=0; i<gArr.length; i++) if(gArr[i] && tArr.indexOf(gArr[i])!==-1) { c++; tArr[tArr.indexOf(gArr[i])]=null; resultArr[i] = "c" }
+                cbContainer.appendChild(createCBRow(origGuessArr, resultArr));
+            });
+        }
+        const cbContainerHTML = cbContainer.outerHTML;
         //const ui = createWordleBoard(10, t.CorrectAns.length);
         html += `
             <div id="log-${t.TaskID}" class="puzzle-log">Target: ${t.CorrectAns.length} letters</div>
-            <div id="CBContainer-${t.TaskID}"></div>
+            ${cbContainerHTML}
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Guess...">
             <button class="submit-btn" onclick="submitCowBull('${t.TaskID}','${t.CorrectAns}','${t.Site}')">Check</button>
         `;
@@ -314,7 +328,7 @@ function submitCowBull(id, target, site) {
         sendSubmission({ team: userTeam, site: site, taskId: id, type: 'cowbull', content: guess, autoPts: 20 });
         alert("🎉 Correct!");
     } else {
-        let guesses = localStorage.getItem(`${id}_Guesses`);
+        let guesses = localStorage.getItem(`${id}_Guesses`, "");
         guesses += `|${guess}`;
         localStorage.setItem(`${id}_Guesses`, guesses);
     }
