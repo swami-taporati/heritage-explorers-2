@@ -471,7 +471,8 @@ async function renderPending() {
                 <div class="quest-card" id="row-${i.row}" style="border-left: 5px solid gold;">
                     <p><strong>Team:</strong> ${i.team} | <strong>Task:</strong> ${i.taskId} | <strong>Points:</strong> ${t.Points}</p>
                     <p><strong>Question:</strong> ${t.Question}</p>
-                    <p style="background: #f0f0f0; padding: 8px; border-radius: 4px;">"${i.content}"</p>
+                    <p><strong>Correct Answer:</strong> ${t.CorrectAns}</p>
+                    <p style="background: #f0f0f0; padding: 8px; border-radius: 4px;"><strong>Submitted Answer: </strong>"${i.content}"</p>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="number" id="p-${i.row}" placeholder="Pts" style="width:70px; margin:0;">
                         <button id="btn-${i.row}" onclick="approveTask(${i.row})" class="submit-btn" style="margin:0; background: #27ae60;">Approve</button>
