@@ -212,7 +212,7 @@ function createTaskUI(t) {
     else if (t.Type === 'cowbull') {
         html += `
             <div id="log-${t.TaskID}" class="puzzle-log">Target: ${t.CorrectAns.length} letters</div>
-            <dic id="CBContainer-${t.TaskID}">createWordleBoard(10, t.CorrectAns.length)</div>
+            <div id="CBContainer-${t.TaskID}"/>
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Guess...">
             <button class="submit-btn" onclick="submitCowBull('${t.TaskID}','${t.CorrectAns}','${t.Site}')">Check</button>
         `;
@@ -232,6 +232,11 @@ function createTaskUI(t) {
         `;
     }
     div.innerHTML = html;
+    if (t.Type === 'cowbull') {
+        const gameContainer = div.getElementById("CBContainer-${t.TaskID}"); 
+        gameContainer.appendChild(createWordleBoard(10, t.CorrectAns.length));
+    }
+    
     return div;
 }
 
