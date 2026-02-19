@@ -210,10 +210,10 @@ function createTaskUI(t) {
         `;
     } 
     else if (t.Type === 'cowbull') {
-        const ui = createWordleBoard(10, t.CorrectAns.length);
+        //const ui = createWordleBoard(10, t.CorrectAns.length);
         html += `
             <div id="log-${t.TaskID}" class="puzzle-log">Target: ${t.CorrectAns.length} letters</div>
-            <div id="CBContainer-${t.TaskID}">${ui}</div>
+            <div id="CBContainer-${t.TaskID}"></div>
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Guess...">
             <button class="submit-btn" onclick="submitCowBull('${t.TaskID}','${t.CorrectAns}','${t.Site}')">Check</button>
         `;
@@ -307,11 +307,30 @@ function submitCowBull(id, target, site) {
     let resultArr = [...Array(tArr.length)].fill('x');
     for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]) { b++; tArr[i]=null; gArr[i]=null; resultArr[i] = "b"}
     for(let i=0; i<gArr.length; i++) if(gArr[i] && tArr.indexOf(gArr[i])!==-1) { c++; tArr[tArr.indexOf(gArr[i])]=null; resultArr[i] = "c" }
-    document.getElementById(`log-${id}`).innerHTML += `<div>${guess}: ${b}B, ${c}C : ${resultArr}</div>`;
+    //document.getElementById(`log-${id}`).innerHTML += `<div>${guess}: ${b}B, ${c}C : ${resultArr}</div>`;
+    document.getElementById(`CBContainer-${id}`).appendChild(createCBRow(gArr, resultArr));
     if (b === target.length) {
         sendSubmission({ team: userTeam, site: site, taskId: id, type: 'cowbull', content: guess, autoPts: 20 });
         alert("🎉 Correct!");
     }
+}
+
+function createCBRow(guessArr, resultArr) {
+    const row = document.createElement("div"); 
+    row.className = "row"; 
+    for (let c = 0; c < resultArr.length; c++) { 
+        const tile = document.createElement("div"); 
+        if(resultArr[c] === "b") {
+            tile.className = "tile.correct"; 
+        } else if (resultArr[c] === "b")  {
+            tile.className = "tile.present"; 
+        } else {
+            tile.className = "tile.absent"; 
+        }
+        tile.innerHTML = "${guessArr[i]}";        
+        row.appendChild(tile); 
+    } 
+    return row; 
 }
 
 function createWordleBoard(rows = 6, cols = 5) { 
