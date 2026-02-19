@@ -226,7 +226,7 @@ function createTaskUI(t) {
         }
         const cbContainerHTML = cbContainer.outerHTML;
         html += `
-            <div id="log-${t.TaskID}" class="puzzle-log">Target: ${t.CorrectAns.length} letters  Maximum guesses allowed: ${t.CorrectAns.length}</div>
+            <div id="log-${t.TaskID}" class="puzzle-log">Target: ${t.CorrectAns.length} letters<br>Maximum guesses allowed: ${t.CorrectAns.length}</div>
             ${cbContainerHTML}
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Guess...">
             <button class="submit-btn" onclick="submitCowBull('${t.TaskID}','${t.CorrectAns}','${t.Site}')">Check</button>
