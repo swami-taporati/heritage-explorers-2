@@ -23,7 +23,7 @@ let selectedTeamTemp = "";
 const APP_TITLE = "Heritage Explorer";
 
 let SCRIPT_URL = SCRIPT_URL_GIRLS_BATCH;
-let TEAMS = TEAMS_BOYS;
+let TEAMS = TEAMS_GIRLS;
 
 window.onload = () => {
     const queryString = window.location.search;
