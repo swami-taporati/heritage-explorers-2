@@ -170,6 +170,15 @@ function createTaskUI(t) {
         let count = parseInt(localStorage.getItem(`clue_count_${t.TaskID}`) || 1);
         points -= ((count - 1)*5);
     }
+    if (t.Type === 'cowbull') {
+        let pastGuessCount = 0;
+        const pastGuesses = localStorage.getItem(t.TaskID + "_Guesses");
+        if (pastGuesses !== null) {
+            const pastGuessesArr = pastGuesses.split("|");
+            pastGuessCount = pastGuessesArr.length;
+        }
+        points = (t.CorrectAns.length - pastGuessCount) * 5;
+    }
 
     let html = `<p><strong>${t.Type.toUpperCase()}:</strong> ${t.Question} (${points} Pts)</p>`;
     
@@ -239,11 +248,17 @@ function createTaskUI(t) {
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Type 'DONE'...">
             <button class="submit-btn" onclick="submitManual('${t.TaskID}','${t.Site}','media')">Confirm</button>
         `;
+    }     
+    else if (t.Type === 'word') {
+        html += `
+            <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Your answer...">
+            <button class="submit-btn" onclick="submitWordAnswer('${t.TaskID}','${t.Site}')">Submit</button>
+        `;
     } 
     else {
         html += `
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Your answer...">
-            <button class="submit-btn" onclick="submitManual('${t.TaskID}','${t.Site}','word')">Send</button>
+            <button class="submit-btn" onclick="submitManual('${t.TaskID}','${t.Site}','short')">Send</button>
         `;
     }
     div.innerHTML = html;    
@@ -368,6 +383,14 @@ function createCBRow(guessArr, resultArr) {
         row.appendChild(tile); 
     } 
     return row; 
+}
+
+function submitWordAnswer(id, site) {
+    const ans = document.getElementById(`in-${id}`).value.toUpperCase().trim();
+    const t = challenges.find(x => x.TaskID === id);
+    const isCorrect = (ans === t.CorrectAns.toString().toUpperCase().trim());
+    sendSubmission({ team: userTeam, site: site, taskId: id, type: 'word', content: `${ans}`, autoPts: isCorrect ? parseInt(t.Points) : 0 });
+    alert(isCorrect ? "🌟 Correct!" : "❌ Incorrect.");
 }
 
 function submitManual(id, site, type) {
