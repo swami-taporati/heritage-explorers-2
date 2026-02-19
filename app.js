@@ -316,9 +316,11 @@ function submitCowBull(id, target, site) {
 }
 
 function createCBRow(guessArr, resultArr) {
-    const row = document.createElement("div"); 
+    const length = resultArr.length;
+    const row = document.createElement("div");     
     row.className = "row"; 
-    for (let c = 0; c < resultArr.length; c++) { 
+    row.style.gridTemplateColumns = `repeat(${length}, 1fr)`
+    for (let c = 0; c < length; c++) { 
         const tile = document.createElement("div"); 
         if(resultArr[c] === "b") {
             tile.className = "tile.correct"; 
