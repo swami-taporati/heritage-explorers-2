@@ -361,6 +361,7 @@ function submitCowBull(id, target, site) {
             guesses += `|${guess}`;
         }
         localStorage.setItem(`${id}_Guesses`, guesses);
+        renderQuests();
     }
 }
 
