@@ -219,8 +219,8 @@ function createTaskUI(t) {
                 let tArr = t.CorrectAns.toUpperCase().split(""), gArr = guess.split("");
                 let origGuessArr = guess.split("");
                 let resultArr = [...Array(tArr.length)].fill('x');
-                for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]) { b++; tArr[i]=null; gArr[i]=null; resultArr[i] = "b"}
-                for(let i=0; i<gArr.length; i++) if(gArr[i] && tArr.indexOf(gArr[i])!==-1) { c++; tArr[tArr.indexOf(gArr[i])]=null; resultArr[i] = "c" }
+                for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]) { tArr[i]=null; gArr[i]=null; resultArr[i] = "b"}
+                for(let i=0; i<gArr.length; i++) if(gArr[i] && tArr.indexOf(gArr[i])!==-1) { tArr[tArr.indexOf(gArr[i])]=null; resultArr[i] = "c" }
                 // cbContainer.appendChild(createCBRow(origGuessArr, resultArr));
             });
         }
