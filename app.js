@@ -327,7 +327,7 @@ function createCBRow(guessArr, resultArr) {
         } else if (resultArr[c] === "b")  {
             tile.className = "tile.present"; 
         } else {
-            tile.className = "tile.absent"; 
+            tile.className = "tile-absent"; 
         }
         const textNode = document.createTextNode(guessArr[c]);
         tile.appendChild(textNode);
