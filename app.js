@@ -329,26 +329,10 @@ function createCBRow(guessArr, resultArr) {
         } else {
             tile.className = "tile.absent"; 
         }
-        tile.innerHTML = guessArr[c];        
+        //tile.innerHTML = guessArr[c];        
         row.appendChild(tile); 
     } 
     return row; 
-}
-
-function createWordleBoard(rows = 6, cols = 5) { 
-    const board = document.createElement("div"); 
-    board.className = "board"; 
-    for (let r = 0; r < rows; r++) { 
-        const row = document.createElement("div"); 
-        row.className = "row"; 
-        for (let c = 0; c < cols; c++) { 
-            const tile = document.createElement("div"); 
-            tile.className = "tile"; 
-            row.appendChild(tile); 
-        } 
-        board.appendChild(row); 
-    } 
-    return board.outerHTML; 
 }
 
 function submitManual(id, site, type) {
