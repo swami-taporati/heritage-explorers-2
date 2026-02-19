@@ -323,15 +323,14 @@ function createCBRow(guessArr, resultArr) {
     for (let c = 0; c < length; c++) { 
         const tile = document.createElement("div"); 
         if(resultArr[c] === "b") {
-            tile.className = "tile.correct"; 
+            tile.className = "tile-correct"; 
         } else if (resultArr[c] === "b")  {
-            tile.className = "tile.present"; 
+            tile.className = "tile-present"; 
         } else {
             tile.className = "tile-absent"; 
         }
         const textNode = document.createTextNode(guessArr[c]);
-        tile.appendChild(textNode);
-        //tile.innerHTML = guessArr[c];        
+        tile.appendChild(textNode);     
         row.appendChild(tile); 
     } 
     return row; 
