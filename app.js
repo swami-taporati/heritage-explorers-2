@@ -327,7 +327,7 @@ function createCBRow(guessArr, resultArr) {
         } else {
             tile.className = "tile.absent"; 
         }
-        tile.innerHTML = guessArr[i];        
+        tile.innerHTML = guessArr[c];        
         row.appendChild(tile); 
     } 
     return row; 
