@@ -164,7 +164,7 @@ input[type="text"], input[type="password"], input[type="number"] {
     color: white; 
 } 
 
-.tile.absent { 
+.tile-absent { 
     background-color: #787c7e; /* gray */
     color: white; 
 }
