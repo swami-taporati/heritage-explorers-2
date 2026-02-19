@@ -302,9 +302,10 @@ function submitCowBull(id, target, site) {
     if (guess.length !== target.length) return alert(`Need ${target.length} letters`);
     let b = 0, c = 0;
     let tArr = target.toUpperCase().split(""), gArr = guess.split("");
-    for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]) { b++; tArr[i]=null; gArr[i]=null; }
-    for(let i=0; i<gArr.length; i++) if(gArr[i] && tArr.indexOf(gArr[i])!==-1) { c++; tArr[tArr.indexOf(gArr[i])]=null; }
-    document.getElementById(`log-${id}`).innerHTML += `<div>${guess}: ${b}B, ${c}C</div>`;
+    let resultArr = [...Array(tArr.length)].fill('x');
+    for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]) { b++; tArr[i]=null; gArr[i]=null; resultArr[i] = "b"}
+    for(let i=0; i<gArr.length; i++) if(gArr[i] && tArr.indexOf(gArr[i])!==-1) { c++; tArr[tArr.indexOf(gArr[i])]=null; resultArr[i] = "c" }
+    document.getElementById(`log-${id}`).innerHTML += `<div>${guess}: ${b}B, ${c}C : ${resultArr}</div>`;
     if (b === target.length) {
         sendSubmission({ team: userTeam, site: site, taskId: id, type: 'cowbull', content: guess, autoPts: 20 });
         alert("🎉 Correct!");
