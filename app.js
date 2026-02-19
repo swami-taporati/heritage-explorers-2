@@ -1,6 +1,7 @@
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwQ3pToy_PjP3v_2dmCCudwl4jtgfDiPPpnWS5O72KelxlHpBKCH9kkGPTgko_nqYQtkw/exec";
+const SCRIPT_URL_GIRLS_BATCH = "https://script.google.com/macros/s/AKfycbwQ3pToy_PjP3v_2dmCCudwl4jtgfDiPPpnWS5O72KelxlHpBKCH9kkGPTgko_nqYQtkw/exec";
+const SCRIPT_URL_BOYS_BATCH = "https://script.google.com/macros/s/AKfycbxTrhPgfjtXDr2gJJJXiOPa_AR55_wz849GJY3izIRwjol0TRsp6BbGShOKHbvfBN6Z5w/exec";
 
-const TEAMS = {
+const TEAMS_GIRLS = {
     "Neelakanta": { pin: "4921", folder: "https://drive.google.com/drive/folders/1Awv_3NvjvPhbnYXyZ-iELT3RA-SZdOBy?usp=drive_link" },
     "Gaja": { pin: "8374", folder: "https://drive.google.com/drive/folders/17FiZFV9g_5xfys1Parn8ZSD50aozR9l5?usp=drive_link" },
     "Kamala": { pin: "2569", folder: "https://drive.google.com/drive/folders/1O4N5IMxpN25aXuK33A608KxFGcixT3WE?usp=drive_link" },
@@ -9,13 +10,30 @@ const TEAMS = {
     "Chitte": { pin: "5050", folder: "https://drive.google.com/drive/folders/166-J6CQcoo5Qsaj68Z3IXC7WbWN-btK7?usp=drive_link" }
 };
 
+const TEAMS_BOYS = {
+    "Neelakanta": { pin: "4921", folder: "https://drive.google.com/drive/folders/1q0AlFqp9h-A13SwzvVwcexmGWbZgZNAR?usp=sharing" },
+    "Gaja": { pin: "8374", folder: "https://drive.google.com/drive/folders/1ljz1KFdHDEAEkOkzuqyR5F4AHuFm4hd6?usp=sharing" },
+    "Srigandha": { pin: "7103", folder: "https://drive.google.com/drive/folders/1MKPBjx09k93_LFmk2Htlscgctf1RWeJe?usp=sharing" }
+}
+
 let userTeam = localStorage.getItem('team');
 let challenges = JSON.parse(localStorage.getItem('challenges') || "[]");
 let selectedTeamTemp = "";
 
 const APP_TITLE = "Heritage Explorer";
 
+let SCRIPT_URL = SCRIPT_URL_GIRLS_BATCH;
+let TEAMS = TEAMS_BOYS;
+
 window.onload = () => {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const batch = urlParams.get('batch');
+
+    if (batch === "boys") {
+        SCRIPT_URL = SCRIPT_URL_BOYS_BATCH;
+        TEAMS = TEAMS_BOYS;
+    }
     initTeams();
     if (userTeam) {
         showView('main-view');
