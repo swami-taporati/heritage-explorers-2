@@ -464,16 +464,32 @@ async function renderPending() {
             list.innerHTML = "<p style='text-align:center; padding:20px;'>🎉 No pending approvals!</p>";
             return;
         }
-
-        list.innerHTML = data.map(i => `
-            <div class="quest-card" id="row-${i.row}" style="border-left: 5px solid gold;">
-                <p><strong>Team:</strong> ${i.team} | <strong>Task:</strong> ${i.taskId}</p>
-                <p style="background: #f0f0f0; padding: 8px; border-radius: 4px;">"${i.content}"</p>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="number" id="p-${i.row}" placeholder="Pts" style="width:70px; margin:0;">
-                    <button id="btn-${i.row}" onclick="approveTask(${i.row})" class="submit-btn" style="margin:0; background: #27ae60;">Approve</button>
+        let html = "";
+        data.forEach(i => {
+            const t = challenges.find(x => x.TaskID === i.taskId);
+            html += `
+                <div class="quest-card" id="row-${i.row}" style="border-left: 5px solid gold;">
+                    <p><strong>Team:</strong> ${i.team} | <strong>Task:</strong> ${i.taskId} | <strong>Points:</strong> ${t.Points}</p>
+                    <p><strong>Question:</strong> ${t.Question}</p>
+                    <p style="background: #f0f0f0; padding: 8px; border-radius: 4px;">"${i.content}"</p>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="number" id="p-${i.row}" placeholder="Pts" style="width:70px; margin:0;">
+                        <button id="btn-${i.row}" onclick="approveTask(${i.row})" class="submit-btn" style="margin:0; background: #27ae60;">Approve</button>
+                    </div>
                 </div>
-            </div>`).join("");
+            `;
+        })
+        list.innerHTML = html;
+
+        // list.innerHTML = data.map(i => `
+        //     <div class="quest-card" id="row-${i.row}" style="border-left: 5px solid gold;">
+        //         <p><strong>Team:</strong> ${i.team} | <strong>Task:</strong> ${i.taskId}</p>
+        //         <p style="background: #f0f0f0; padding: 8px; border-radius: 4px;">"${i.content}"</p>
+        //         <div style="display: flex; gap: 10px; align-items: center;">
+        //             <input type="number" id="p-${i.row}" placeholder="Pts" style="width:70px; margin:0;">
+        //             <button id="btn-${i.row}" onclick="approveTask(${i.row})" class="submit-btn" style="margin:0; background: #27ae60;">Approve</button>
+        //         </div>
+        //     </div>`).join("");
     } catch (e) {
         list.innerHTML = "<p>Error loading pending tasks. Check internet.</p>";
     }
