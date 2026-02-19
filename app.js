@@ -329,6 +329,8 @@ function createCBRow(guessArr, resultArr) {
         } else {
             tile.className = "tile.absent"; 
         }
+        const textNode = document.createTextNode(guessArr[c]);
+        tile.appendChild(textNode);
         //tile.innerHTML = guessArr[c];        
         row.appendChild(tile); 
     } 
