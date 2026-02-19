@@ -457,6 +457,9 @@ async function renderPending() {
     list.innerHTML = "<p style='text-align:center;'>⏳ Fetching submissions...</p>";
     
     try {
+        if (challenges.length === 0 {
+            await syncData();
+        }
         const res = await fetch(`${SCRIPT_URL}?action=getPending`);
         const data = await res.json();
         
