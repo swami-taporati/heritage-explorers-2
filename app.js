@@ -478,7 +478,7 @@ async function renderPending() {
                     <p style="background: #f0f0f0; padding: 8px; border-radius: 4px;"><strong>Submitted Answer: </strong>"${i.content}"</p>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="number" id="p-${i.row}" placeholder="Pts" style="width:70px; margin:0;">
-                        <button id="btn-${i.row}" onclick="approveTask(${i.row}, maxPoints=${t.Points})" class="submit-btn" style="margin:0; background: #27ae60;">Approve</button>
+                        <button id="btn-${i.row}" onclick="approveTask(${i.row}, ${t.Points})" class="submit-btn" style="margin:0; background: #27ae60;">Approve</button>
                     </div>
                 </div>
             `;
