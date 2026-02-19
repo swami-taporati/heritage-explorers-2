@@ -304,11 +304,12 @@ function submitCowBull(id, target, site) {
     if (guess.length !== target.length) return alert(`Need ${target.length} letters`);
     let b = 0, c = 0;
     let tArr = target.toUpperCase().split(""), gArr = guess.split("");
+    let origGuessArr = guess.split("");
     let resultArr = [...Array(tArr.length)].fill('x');
     for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]) { b++; tArr[i]=null; gArr[i]=null; resultArr[i] = "b"}
     for(let i=0; i<gArr.length; i++) if(gArr[i] && tArr.indexOf(gArr[i])!==-1) { c++; tArr[tArr.indexOf(gArr[i])]=null; resultArr[i] = "c" }
     //document.getElementById(`log-${id}`).innerHTML += `<div>${guess}: ${b}B, ${c}C : ${resultArr}</div>`;
-    document.getElementById(`CBContainer-${id}`).appendChild(createCBRow(gArr, resultArr));
+    document.getElementById(`CBContainer-${id}`).appendChild(createCBRow(origGuessArr, resultArr));
     if (b === target.length) {
         sendSubmission({ team: userTeam, site: site, taskId: id, type: 'cowbull', content: guess, autoPts: 20 });
         alert("🎉 Correct!");
@@ -324,7 +325,7 @@ function createCBRow(guessArr, resultArr) {
         const tile = document.createElement("div"); 
         if(resultArr[c] === "b") {
             tile.className = "tile-correct"; 
-        } else if (resultArr[c] === "b")  {
+        } else if (resultArr[c] === "c")  {
             tile.className = "tile-present"; 
         } else {
             tile.className = "tile-absent"; 
