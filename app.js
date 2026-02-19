@@ -327,7 +327,7 @@ function createWordleBoard(rows = 6, cols = 5) {
         } 
         board.appendChild(row); 
     } 
-    return board; 
+    return board.outerHTML; 
 }
 
 function submitManual(id, site, type) {
