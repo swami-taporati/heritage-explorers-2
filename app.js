@@ -312,6 +312,22 @@ function submitCowBull(id, target, site) {
     }
 }
 
+function createWordleBoard(rows = 6, cols = 5) { 
+    const board = document.createElement("div"); 
+    board.className = "board"; 
+    for (let r = 0; r < rows; r++) { 
+        const row = document.createElement("div"); 
+        row.className = "row"; 
+        for (let c = 0; c < cols; c++) { 
+            const tile = document.createElement("div"); 
+            tile.className = "tile"; 
+            row.appendChild(tile); 
+        } 
+        board.appendChild(row); 
+    } 
+    return board; 
+}
+
 function submitManual(id, site, type) {
     const val = document.getElementById(`in-${id}`).value.trim();
     if (val.length < 2) return alert("Enter an answer");
