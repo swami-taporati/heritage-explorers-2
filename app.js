@@ -320,7 +320,7 @@ function createCBRow(guessArr, resultArr) {
     const length = resultArr.length;
     const row = document.createElement("div");     
     row.className = "row"; 
-    row.style.gridTemplateColumns = `repeat(${length}, 1fr)`
+    row.style.gridTemplateColumns = `repeat(${length}, 25px)`
     for (let c = 0; c < length; c++) { 
         const tile = document.createElement("div"); 
         if(resultArr[c] === "b") {
