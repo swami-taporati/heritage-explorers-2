@@ -477,8 +477,8 @@ async function renderPending() {
                     <p><strong>Correct Answer:</strong> ${t.CorrectAns}</p>
                     <p style="background: #f0f0f0; padding: 8px; border-radius: 4px;"><strong>Submitted Answer: </strong>"${i.content}"</p>
                     <div style="display: flex; gap: 10px; align-items: center;">
-                        <input type="number" id="p-${i.row}" min=0 max=${t.Points} placeholder="Pts" style="width:70px; margin:0;">
-                        <button id="btn-${i.row}" onclick="approveTask(${i.row})" class="submit-btn" style="margin:0; background: #27ae60;">Approve</button>
+                        <input type="number" id="p-${i.row}" placeholder="Pts" style="width:70px; margin:0;">
+                        <button id="btn-${i.row}" onclick="approveTask(${i.row}, maxPoints=${t.Points})" class="submit-btn" style="margin:0; background: #27ae60;">Approve</button>
                     </div>
                 </div>
             `;
@@ -520,12 +520,13 @@ async function updateAdminLeaderboard() {
         container.innerHTML = "⚠️ Error loading scores.";
     }
 }
-async function approveTask(row) {
-    const pts = document.getElementById(`p-${row}`).value;
+async function approveTask(row, maxPoints) {
+    const pts = document.getElementById(`p-${row}`).value;    
     const btn = document.getElementById(`btn-${row}`);
     const card = document.getElementById(`row-${row}`);
 
     if (!pts) return alert("Please enter points first!");
+    if( pts < 0 || pts > maxPoints ) return alert("Please assign points between 0 and ${maxPoints}");
 
     // INSTANT FEEDBACK
     btn.innerText = "⏳ Sending...";
