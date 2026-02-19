@@ -526,7 +526,7 @@ async function approveTask(row, maxPoints) {
     const card = document.getElementById(`row-${row}`);
 
     if (!pts) return alert("Please enter points first!");
-    if( pts < 0 || pts > maxPoints ) return alert("Please assign points between 0 and ${maxPoints}");
+    if( pts < 0 || pts > maxPoints ) return alert(`Please assign points between 0 and ${maxPoints}`);
 
     // INSTANT FEEDBACK
     btn.innerText = "⏳ Sending...";
