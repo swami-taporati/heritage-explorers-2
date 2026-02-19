@@ -216,7 +216,7 @@ function createTaskUI(t) {
         if (pastGuesses !== null) {
             const pastGuessesArr = pastGuesses.split("|");
             pastGuessesArr.forEach( guess => {                
-                // let tArr = t.CorrectAns.toUpperCase().split(""), gArr = guess.split("");
+                let tArr = t.CorrectAns.toUpperCase().split(""), gArr = guess.split("");
                 // let origGuessArr = guess.split("");
                 // let resultArr = [...Array(tArr.length)].fill('x');
                 // for(let i=0; i<tArr.length; i++) if(gArr[i]===tArr[i]) { b++; tArr[i]=null; gArr[i]=null; resultArr[i] = "b"}
