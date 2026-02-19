@@ -120,7 +120,7 @@ function renderQuests() {
     cont.innerHTML = "";
     
     // FIX: Filter out any challenges where SiteCode is missing or empty
-    const validChallenges = challenges.filter(c => c.SiteCode && c.SiteCode.toString().trim() !== "");
+    const validChallenges = challenges.filter(c => c.SiteCode && c.SiteCode.toString().trim() !== "" && c.TaskID && c.TaskID.toString().trim() !== "" );
 
     if (validChallenges.length === 0) {
         cont.innerHTML = "<p style='text-align:center; padding:20px;'>No challenges found. Please Sync.</p>";
@@ -147,7 +147,7 @@ function renderQuests() {
                     <button onclick="goBack()" class="back-link">Back</button>
                 </div>
             `;
-            validChallenges.filter(c => (c.Site === site && c.TaskID !== null && c.TaskID.trim().length !== 0 ).forEach(t => {
+            validChallenges.filter(c => (c.Site === site).forEach(t => {
                 card.appendChild(createTaskUI(t));
             });
         }
