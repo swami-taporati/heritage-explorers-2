@@ -215,6 +215,7 @@ function createTaskUI(t) {
             <input type="text" id="in-${t.TaskID}" class="quiz-opt" placeholder="Guess...">
             <button class="submit-btn" onclick="submitCowBull('${t.TaskID}','${t.CorrectAns}','${t.Site}')">Check</button>
         `;
+        const gameContainer = document.getElementById("log-${t.TaskID}"); gameContainer.appendChild(createWordleBoard(10, t.CorrectAns.length));
     } 
     else if (t.Type === 'media') {
         const folder = TEAMS[userTeam].folder;
