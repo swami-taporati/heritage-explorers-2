@@ -151,20 +151,22 @@ input[type="text"], input[type="password"], input[type="number"] {
     font-size: 24px; 
     font-weight: bold; 
     text-transform: uppercase; 
-    background-color: white; 
 } 
 
-.tile.correct { 
+.tile-correct { 
+    @extend .tile;
     background-color: #6aaa64; /* green */ 
     color: white; 
 } 
 
-.tile.present { 
+.tile-present { 
+    @extend .tile;
     background-color: #c9b458; /* yellow */ 
     color: white; 
 } 
 
 .tile-absent { 
+    @extend .tile;
     background-color: #787c7e; /* gray */
     color: white; 
 }
