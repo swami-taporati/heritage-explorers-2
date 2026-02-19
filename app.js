@@ -313,6 +313,10 @@ function submitCowBull(id, target, site) {
     if (b === target.length) {
         sendSubmission({ team: userTeam, site: site, taskId: id, type: 'cowbull', content: guess, autoPts: 20 });
         alert("🎉 Correct!");
+    } else {
+        let guesses = localStorage.getItem(`${id}_Guesses`);
+        guesses += `|${guess}`;
+        localStorage.setItem(`${id}_Guesses`, guesses);
     }
 }
 
