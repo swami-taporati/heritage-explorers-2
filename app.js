@@ -212,9 +212,10 @@ function createTaskUI(t) {
     else if (t.Type === 'cowbull') {
         const cbContainer = document.createElement("div");
         cbContainer.id = "CBContainer-" + t.TaskID;
-        const pastGuesses = localStorage.getItem(`${id}_Guesses`, "").split("|");
-        if(pastGuesses.length > 0) {
-            pastGuesses.forEach( guess => {                
+        const pastGuesses = localStorage.getItem(`${id}_Guesses`);
+        if (pastGuesses !== null) {
+            const pastGuessesArr = pastGuesses.split("|");
+            pastGuessesArr.forEach( guess => {                
                 let tArr = t.CorrectAns.toUpperCase().split(""), gArr = guess.split("");
                 let origGuessArr = guess.split("");
                 let resultArr = [...Array(tArr.length)].fill('x');
