@@ -147,7 +147,7 @@ function renderQuests() {
                     <button onclick="goBack()" class="back-link">Back</button>
                 </div>
             `;
-            validChallenges.filter(c => (c.Site === site).forEach(t => {
+            validChallenges.filter(c => (c.Site === site)).forEach(t => {
                 card.appendChild(createTaskUI(t));
             });
         }
